@@ -94,3 +94,4 @@ Frontend sẽ chạy tại `http://localhost:5173`
 - **Officer**: canbo@tlu.edu.vn / 123456
 - **Citizen**: dan@gmail.com / 123456
 "# landslide-system" 
+"# landslide-management-system" 
