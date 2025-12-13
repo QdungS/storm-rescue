@@ -27,16 +27,38 @@ const allowedOrigins = process.env.FRONTEND_URL
   ? process.env.FRONTEND_URL.split(',').map(url => url.trim())
   : ['http://localhost:5173'];
 
+// Check if origin is a Vercel domain
+const isVercelDomain = (origin) => {
+  return origin && (
+    origin.includes('.vercel.app') || 
+    origin.includes('.vercel.sh') ||
+    origin.includes('localhost') ||
+    origin.includes('127.0.0.1')
+  );
+};
+
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (mobile apps, Postman, etc.)
     if (!origin) return callback(null, true);
     
-    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
+    // Allow if in allowed origins list
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      return callback(null, true);
     }
+    
+    // Allow Vercel domains in production
+    if (isVercelDomain(origin)) {
+      return callback(null, true);
+    }
+    
+    // Allow all origins in development
+    if (process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+    
+    // Reject in production if not allowed
+    callback(new Error('Not allowed by CORS'));
   },
   credentials: true
 }));
