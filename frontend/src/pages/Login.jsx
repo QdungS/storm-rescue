@@ -13,7 +13,11 @@ const Login = () => {
     const result = await login(values.email, values.password);
     if (result.success) {
       message.success('Đăng nhập thành công!');
-      navigate('/'); // Chuyển về trang chủ
+      // Use replace: true to avoid adding to history stack
+      // This prevents 404 issues with Vercel routing
+      setTimeout(() => {
+        navigate('/', { replace: true });
+      }, 100);
     } else {
       message.error(result.message);
     }
