@@ -48,6 +48,25 @@ app.use(express.urlencoded({ extended: true }));
 // Static files for uploads
 app.use('/uploads', express.static('uploads'));
 
+// Root route
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Landslide Management System API',
+    version: '1.0.0',
+    status: 'running',
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      health: '/health',
+      auth: '/api/auth',
+      landslides: '/api/landslides',
+      warnings: '/api/warnings',
+      reports: '/api/reports',
+      users: '/api/users',
+      safety: '/api/safety'
+    }
+  });
+});
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
@@ -72,8 +91,8 @@ const startServer = async () => {
     await connectDatabase();
     console.log('✓ Database connected');
 
-    // Start listening
-    app.listen(PORT, () => {
+    // Start listening - use 0.0.0.0 for Render deployment
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`✓ Server running on port ${PORT}`);
       console.log(`✓ Environment: ${process.env.NODE_ENV || 'development'}`);
     });
