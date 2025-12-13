@@ -94,6 +94,24 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+// API info route
+app.get('/api', (req, res) => {
+  res.json({
+    message: 'Landslide Management System API',
+    version: '1.0.0',
+    status: 'running',
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      auth: '/api/auth',
+      landslides: '/api/landslides',
+      warnings: '/api/warnings',
+      reports: '/api/reports',
+      users: '/api/users',
+      safety: '/api/safety'
+    }
+  });
+});
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/landslides', landslideRoutes);
