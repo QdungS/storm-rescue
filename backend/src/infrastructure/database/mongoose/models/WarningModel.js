@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+﻿import mongoose from 'mongoose';
 import { WARNING_LEVEL } from '../../../../shared/constants/roles.js';
 
 const warningSchema = new mongoose.Schema({
@@ -6,11 +6,10 @@ const warningSchema = new mongoose.Schema({
   content: { type: String, required: true },
   level: { type: String, enum: Object.values(WARNING_LEVEL), default: WARNING_LEVEL.WARNING },
   location: { type: String, trim: true },
-  province: { type: String, trim: true }, // Tỉnh
-  district: { type: String, trim: true } // Xã/Phường - để giới hạn quyền Officer
+  province: { type: String, trim: true },
+  district: { type: String, trim: true }
 }, {
   timestamps: true
 });
 
 export const WarningModel = mongoose.model('Warning', warningSchema);
-

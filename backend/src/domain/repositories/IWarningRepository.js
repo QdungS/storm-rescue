@@ -19,4 +19,3 @@ export class IWarningRepository {
     throw new Error('Method delete() must be implemented');
   }
 }
-

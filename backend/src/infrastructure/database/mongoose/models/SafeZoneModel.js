@@ -14,4 +14,3 @@ const safeZoneSchema = new mongoose.Schema({
 });
 
 export const SafeZoneModel = mongoose.model('SafeZone', safeZoneSchema);
-

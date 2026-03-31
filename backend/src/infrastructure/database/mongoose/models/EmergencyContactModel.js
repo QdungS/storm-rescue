@@ -10,4 +10,3 @@ const emergencyContactSchema = new mongoose.Schema({
 });
 
 export const EmergencyContactModel = mongoose.model('EmergencyContact', emergencyContactSchema);
-

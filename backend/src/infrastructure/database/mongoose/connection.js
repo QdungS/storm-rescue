@@ -24,4 +24,3 @@ export const disconnectDatabase = async () => {
     throw error;
   }
 };
-

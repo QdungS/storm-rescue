@@ -7,8 +7,7 @@ export const authenticate = async (req, res, next) => {
   try {
     let token;
 
-    // Get token from header
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
       token = req.headers.authorization.split(' ')[1];
     }
 
@@ -16,19 +15,16 @@ export const authenticate = async (req, res, next) => {
       throw new AppError('Not authorized to access this route', 401);
     }
 
-    // Verify token
-    const decoded = verifyToken(token);
-    
-    // Get full user info from database (including district for officers)
-    const userRepository = new UserRepository();
+const decoded = verifyToken(token);
+
+const userRepository = new UserRepository();
     const user = await userRepository.findById(decoded.id);
-    
+
     if (!user) {
       throw new AppError('User not found', 401);
     }
-    
-    // Attach user info to request
-    req.user = {
+
+req.user = {
       id: user.id,
       email: user.email,
       role: user.role,
@@ -59,27 +55,24 @@ export const authorize = (...roles) => {
   };
 };
 
-// Optional authentication - không bắt buộc token, nhưng nếu có thì lấy user info
 export const optionalAuthenticate = async (req, res, next) => {
   try {
     let token;
 
-    // Get token from header
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
       token = req.headers.authorization.split(' ')[1];
     }
 
     if (token) {
       try {
-        // Verify token
+
         const decoded = verifyToken(token);
-        
-        // Get full user info from database
-        const userRepository = new UserRepository();
+
+const userRepository = new UserRepository();
         const user = await userRepository.findById(decoded.id);
-        
+
         if (user) {
-          // Attach user info to request
+
           req.user = {
             id: user.id,
             email: user.email,
@@ -89,14 +82,12 @@ export const optionalAuthenticate = async (req, res, next) => {
           };
         }
       } catch (error) {
-        // Token invalid or expired, but continue without user
-        // Don't throw error, just proceed without req.user
-      }
+
+}
     }
-    
+
     next();
   } catch (error) {
     next(error);
   }
 };
-

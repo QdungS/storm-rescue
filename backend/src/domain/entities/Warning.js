@@ -10,4 +10,3 @@ export class Warning {
     this.createdAt = createdAt;
   }
 }
-

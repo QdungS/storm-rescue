@@ -30,4 +30,3 @@ export class AddSavedLocationUseCase {
     return updated.toJSON();
   }
 }
-

@@ -8,7 +8,7 @@ export class DeleteUserUseCase {
 
   async execute(userId) {
     const user = await this.userRepository.findById(userId);
-    
+
     if (!user) {
       throw new AppError('User not found', 404);
     }
@@ -17,4 +17,3 @@ export class DeleteUserUseCase {
     return true;
   }
 }
-

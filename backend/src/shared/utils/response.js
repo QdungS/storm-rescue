@@ -13,4 +13,3 @@ export const errorResponse = (res, message = 'Error', statusCode = 400, errors =
     ...(errors && { errors })
   });
 };
-

@@ -9,4 +9,3 @@ const safetyGuideSchema = new mongoose.Schema({
 });
 
 export const SafetyGuideModel = mongoose.model('SafetyGuide', safetyGuideSchema);
-

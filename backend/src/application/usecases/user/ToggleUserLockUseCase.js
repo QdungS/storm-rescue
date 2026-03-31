@@ -9,17 +9,16 @@ export class ToggleUserLockUseCase {
 
   async execute(userId) {
     const user = await this.userRepository.findById(userId);
-    
+
     if (!user) {
       throw new AppError('User not found', 404);
     }
 
-    const newStatus = user.status === USER_STATUS.ACTIVE 
-      ? USER_STATUS.LOCKED 
+    const newStatus = user.status === USER_STATUS.ACTIVE
+      ? USER_STATUS.LOCKED
       : USER_STATUS.ACTIVE;
 
     const updated = await this.userRepository.update(userId, { status: newStatus });
     return updated.toJSON();
   }
 }
-

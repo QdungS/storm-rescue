@@ -4,7 +4,7 @@ import { ManageEmergencyContactUseCase } from '../../../application/usecases/saf
 import { successResponse } from '../../../shared/utils/response.js';
 
 export class SafetyController {
-  // Safety Guides
+
   async createGuide(req, res, next) {
     try {
       const useCase = new ManageSafetyGuideUseCase();
@@ -45,11 +45,14 @@ export class SafetyController {
     }
   }
 
-  // Safe Zones
-  async createSafeZone(req, res, next) {
+async createSafeZone(req, res, next) {
     try {
+      const data = { ...req.body };
+      if (req.user && (req.user.role === 'coordinator' || req.user.role === 'officer')) {
+        data.province = req.user.province ? req.user.province.trim() : null;
+      }
       const useCase = new ManageSafeZoneUseCase();
-      const zone = await useCase.create(req.body, req.user?.role, req.user?.province);
+      const zone = await useCase.create(data);
       return successResponse(res, zone, 'Safe zone created successfully', 201);
     } catch (error) {
       next(error);
@@ -58,8 +61,12 @@ export class SafetyController {
 
   async getSafeZones(req, res, next) {
     try {
+      const query = { ...(req.query || {}) };
+      if (req.user && (req.user.role === 'coordinator' || req.user.role === 'officer')) {
+        query.province = req.user.province ? req.user.province.trim() : null;
+      }
       const useCase = new ManageSafeZoneUseCase();
-      const zones = await useCase.getAll(req.query || {}, req.user?.role, req.user?.province);
+      const zones = await useCase.getAll(query);
       return successResponse(res, zones, 'Safe zones retrieved successfully');
     } catch (error) {
       next(error);
@@ -68,8 +75,12 @@ export class SafetyController {
 
   async updateSafeZone(req, res, next) {
     try {
+      const data = { ...req.body };
+      if (req.user && (req.user.role === 'coordinator' || req.user.role === 'officer')) {
+        data.province = req.user.province ? req.user.province.trim() : null;
+      }
       const useCase = new ManageSafeZoneUseCase();
-      const zone = await useCase.update(req.params.id, req.body, req.user?.role, req.user?.province);
+      const zone = await useCase.update(req.params.id, data);
       return successResponse(res, zone, 'Safe zone updated successfully');
     } catch (error) {
       next(error);
@@ -79,18 +90,17 @@ export class SafetyController {
   async deleteSafeZone(req, res, next) {
     try {
       const useCase = new ManageSafeZoneUseCase();
-      await useCase.delete(req.params.id, req.user?.role, req.user?.province);
+      await useCase.delete(req.params.id);
       return successResponse(res, null, 'Safe zone deleted successfully');
     } catch (error) {
       next(error);
     }
   }
 
-  // Emergency Contacts
-  async createContact(req, res, next) {
+async createContact(req, res, next) {
     try {
       const useCase = new ManageEmergencyContactUseCase();
-      const contact = await useCase.create(req.body, req.user?.role, req.user?.province);
+      const contact = await useCase.create(req.body);
       return successResponse(res, contact, 'Emergency contact created successfully', 201);
     } catch (error) {
       next(error);
@@ -100,7 +110,7 @@ export class SafetyController {
   async getContacts(req, res, next) {
     try {
       const useCase = new ManageEmergencyContactUseCase();
-      const contacts = await useCase.getAll(req.query || {}, req.user?.role, req.user?.province);
+      const contacts = await useCase.getAll(req.query || {});
       return successResponse(res, contacts, 'Emergency contacts retrieved successfully');
     } catch (error) {
       next(error);
@@ -110,7 +120,7 @@ export class SafetyController {
   async updateContact(req, res, next) {
     try {
       const useCase = new ManageEmergencyContactUseCase();
-      const contact = await useCase.update(req.params.id, req.body, req.user?.role, req.user?.province);
+      const contact = await useCase.update(req.params.id, req.body);
       return successResponse(res, contact, 'Emergency contact updated successfully');
     } catch (error) {
       next(error);
@@ -120,11 +130,10 @@ export class SafetyController {
   async deleteContact(req, res, next) {
     try {
       const useCase = new ManageEmergencyContactUseCase();
-      await useCase.delete(req.params.id, req.user?.role, req.user?.province);
+      await useCase.delete(req.params.id);
       return successResponse(res, null, 'Emergency contact deleted successfully');
     } catch (error) {
       next(error);
     }
   }
 }
-

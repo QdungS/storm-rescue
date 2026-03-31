@@ -1,103 +1,99 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Card, message, Modal } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { Form, Input, Button, message, Typography } from 'antd';
+import { UserOutlined, LockOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 
+const { Title, Text } = Typography;
+
 const Login = () => {
-  const { login, loginGuest } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
-  const [guestModalOpen, setGuestModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const onFinish = async (values) => {
+    setLoading(true);
     const result = await login(values.email, values.password);
+    setLoading(false);
+
     if (result.success) {
-      message.success('Đăng nhập thành công!');
-      // Use replace: true to avoid adding to history stack
-      // This prevents 404 issues with Vercel routing
+      message.success({ content: 'Đăng nhập thành công!', duration: 2 });
       setTimeout(() => {
         navigate('/', { replace: true });
-      }, 100);
+      }, 300);
     } else {
-      message.error(result.message);
+      message.error({ content: result.message || 'Lỗi đăng nhập, vui lòng thử lại', duration: 3 });
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-full bg-gray-100">
-      <Card title="Đăng nhập hệ thống" className="w-96 shadow-lg">
-        <Form name="login" onFinish={onFinish} layout="vertical">
+    <div className="min-h-[calc(100vh-120px)] w-full bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex justify-center items-center py-10 px-4 relative overflow-hidden font-sans">
+      {/* Background decorations */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-blue-500/20 blur-[120px]"></div>
+        <div className="absolute top-[60%] -right-[10%] w-[40%] h-[60%] rounded-full bg-cyan-500/20 blur-[100px]"></div>
+        <div className="absolute bottom-[20%] right-[20%] w-[30%] h-[30%] rounded-full bg-indigo-500/20 blur-[90px]"></div>
+      </div>
+
+      <div className="w-full max-w-md bg-white/95 backdrop-blur-xl rounded-[1.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] border border-white/20 p-6 sm:p-8 relative z-10 transition-all duration-300 hover:shadow-[0_20px_70px_-10px_rgba(0,0,0,0.6)]">
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 text-white shadow-lg mb-4 transform transition-transform hover:scale-105 duration-300">
+            <SafetyCertificateOutlined className="text-2xl" />
+          </div>
+          <Title level={3} className="!mb-1 !text-slate-800 tracking-tight font-bold">Đăng Nhập Hệ Thống</Title>
+
+        </div>
+
+        <Form
+          name="login"
+          onFinish={onFinish}
+          layout="vertical"
+          className="login-form mt-4"
+        >
           <Form.Item
             name="email"
-            rules={[{ required: true, message: 'Vui lòng nhập Email!' }]}
+            rules={[
+              { required: true, message: 'Vui lòng nhập Email!' },
+              { type: 'email', message: 'Email không hợp lệ!' }
+            ]}
           >
-            <Input prefix={<UserOutlined />} placeholder="Email (admin@tlu.edu.vn)" />
+            <Input
+              prefix={<UserOutlined className="text-slate-400 mr-2" />}
+              placeholder="Email của bạn"
+              className="rounded-lg px-3 py-2.5 bg-slate-50/50 hover:bg-white focus:bg-white border-slate-200 shadow-sm transition-all duration-300 hover:border-blue-400 focus:border-blue-500"
+            />
           </Form.Item>
+
           <Form.Item
             name="password"
             rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
+            className="!mb-4"
           >
-            <Input.Password prefix={<LockOutlined />} placeholder="Mật khẩu (123456)" />
+            <Input.Password
+              prefix={<LockOutlined className="text-slate-400 mr-2" />}
+              placeholder="Mật khẩu"
+              className="rounded-lg px-3 py-2.5 bg-slate-50/50 hover:bg-white focus:bg-white border-slate-200 shadow-sm transition-all duration-300 hover:border-blue-400 focus:border-blue-500"
+            />
           </Form.Item>
 
-          <Form.Item>
-            <Button type="primary" htmlType="submit" className="w-full bg-blue-600">
-              Đăng nhập
-            </Button>
-          </Form.Item>
-
-          <Form.Item>
-            <Button type="default" className="w-full" onClick={() => setGuestModalOpen(true)}>
-              Truy cập nhanh (Khách)
-            </Button>
-          </Form.Item>
-          
-          <div className="text-center">
-            Chưa có tài khoản? <Link to="/register" className="text-blue-500">Đăng ký ngay</Link>
+          <div className="flex justify-end mb-6 mt-1">
+            <Link to="/forgot-password" title="Khôi phục mật khẩu" className="text-blue-600 font-medium hover:text-blue-500 transition-colors text-xs hover:underline decoration-blue-500/30 underline-offset-4">
+              Quên mật khẩu?
+            </Link>
           </div>
+
+          <Form.Item className="!mb-0">
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              className="w-full h-11 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 border-0 shadow-sm hover:shadow-md text-sm font-semibold tracking-wide transition-all duration-300"
+            >
+              Đăng nhập ngay
+            </Button>
+          </Form.Item>
         </Form>
-      </Card>
-
-      <Modal
-        title="Truy cập nhanh với tư cách Khách"
-        open={guestModalOpen}
-        onCancel={() => setGuestModalOpen(false)}
-        onOk={() => {
-          const result = loginGuest({});
-          if (result.success) {
-            message.success('Đã vào chế độ Khách');
-            setGuestModalOpen(false);
-            navigate('/');
-          } else {
-            message.error(result.message || 'Không thể vào chế độ Khách');
-          }
-        }}
-        okText="Vào hệ thống"
-      >
-        <div className="py-4">
-          <p className="text-base text-gray-700 mb-4">
-            Với tư cách <strong>Khách</strong>, bạn có thể:
-          </p>
-          <ul className="list-disc list-inside text-sm text-gray-600 mb-4 space-y-2">
-            <li>Xem tất cả điểm sạt lở trên bản đồ</li>
-            <li>Xem cảnh báo theo tỉnh/thành phố (chọn từ danh sách thả xuống)</li>
-            <li>Xem hướng dẫn an toàn và liên hệ khẩn cấp</li>
-          </ul>
-          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mt-4">
-            <p className="text-sm text-yellow-800">
-              <strong>Lưu ý:</strong> Để gửi báo cáo về điểm sạt lở, bạn cần{' '}
-              <Link 
-                to="/register" 
-                className="text-blue-600 font-semibold underline"
-                onClick={() => setGuestModalOpen(false)}
-              >
-                đăng ký tài khoản
-              </Link>
-              {' '}hoặc đăng nhập với tài khoản đã có.
-            </p>
-          </div>
-        </div>
-      </Modal>
+      </div>
     </div>
   );
 };

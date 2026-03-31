@@ -52,4 +52,3 @@ export const safetyService = {
     return await api.delete(`/safety/contacts/${id}`);
   }
 };
-

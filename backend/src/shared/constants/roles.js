@@ -2,6 +2,7 @@ export const ROLES = {
   CITIZEN: 'citizen',
   OFFICER: 'officer',
   ADMIN: 'admin',
+  COORDINATOR: 'coordinator',
   GUEST: 'guest'
 };
 
@@ -28,15 +29,3 @@ export const LOCATION_TYPE = {
   WORK: 'work',
   OTHER: 'other'
 };
-
-// Danh sách loại sạt lở hỗ trợ nhập liệu và validation
-export const LANDSLIDE_TYPES = {
-  LANDSLIDE: 'Sạt lở đất',
-  ROCKFALL: 'Sạt lở đá',
-  FLASH_FLOOD: 'Lũ quét',
-  RIVERBANK: 'Sạt lở ven sông',
-  SUBSIDENCE: 'Sụt lún/Hố sụt',
-  TALUS: 'Trượt taluy đường',
-  DEBRIS_FLOW: 'Dòng bùn đá'
-};
-

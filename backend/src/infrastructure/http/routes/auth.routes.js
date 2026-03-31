@@ -16,17 +16,24 @@ router.post('/login',
   authController.login.bind(authController)
 );
 
-router.post('/register',
-  [
-    body('name').notEmpty().withMessage('Name is required'),
-    body('email').isEmail().withMessage('Please provide a valid email'),
-    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
-  ],
-  validateRequest,
-  authController.register.bind(authController)
-);
-
 router.get('/me', authenticate, authController.getMe.bind(authController));
 
-export default router;
+router.post('/forgot-password',
+  [
+    body('email').isEmail().withMessage('Vui lòng nhập email hợp lệ')
+  ],
+  validateRequest,
+  authController.forgotPassword.bind(authController)
+);
 
+router.post('/reset-password',
+  [
+    body('email').isEmail().withMessage('Vui lòng nhập email hợp lệ'),
+    body('code').notEmpty().withMessage('Mã xác nhận là bắt buộc'),
+    body('newPassword').isLength({ min: 6 }).withMessage('Mật khẩu mới phải có ít nhất 6 ký tự')
+  ],
+  validateRequest,
+  authController.resetPassword.bind(authController)
+);
+
+export default router;

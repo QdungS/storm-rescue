@@ -14,4 +14,3 @@ export class GetMySavedLocationsUseCase {
     return user.savedLocations || [];
   }
 }
-

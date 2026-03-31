@@ -5,14 +5,17 @@ import { Bell, AlertTriangle, Info } from 'lucide-react';
 const { Text, Paragraph } = Typography;
 
 const WarningList = ({ warnings }) => {
-  
-  // Hàm chọn icon và màu sắc dựa theo mức độ
-  const getLevelStyle = (level) => {
+
+const getLevelStyle = (level) => {
     switch (level) {
       case 'urgent':
+      case 'Khẩn cấp':
         return { color: 'red', icon: <AlertTriangle size={18} className="text-red-500" />, label: 'Khẩn cấp' };
       case 'warning':
+      case 'Cảnh báo':
         return { color: 'orange', icon: <Bell size={18} className="text-orange-500" />, label: 'Cảnh báo' };
+      case 'info':
+      case 'Thông tin':
       default:
         return { color: 'blue', icon: <Info size={18} className="text-blue-500" />, label: 'Thông tin' };
     }
@@ -38,7 +41,7 @@ const WarningList = ({ warnings }) => {
                 description={
                   <div>
                     <div className="text-xs text-gray-400 mb-2">
-                      {item.timestamp || (item.createdAt ? new Date(item.createdAt).toLocaleString('vi-VN') : '')} 
+                      {item.timestamp || (item.createdAt ? new Date(item.createdAt).toLocaleString('vi-VN') : '')}
                       {item.province && ` • ${item.province}`}
                       {item.district && ` - ${item.district}`}
                       {item.location && ` • ${item.location}`}

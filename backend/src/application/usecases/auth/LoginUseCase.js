@@ -10,27 +10,24 @@ export class LoginUseCase {
   }
 
   async execute(email, password) {
-    // Find user by email
+
     const user = await this.userRepository.findByEmail(email);
-    
+
     if (!user) {
-      throw new AppError('Invalid email or password', 401);
+      throw new AppError('Sai tài khoản hoặc mật khẩu', 401);
     }
 
-    // Check if account is locked
-    if (user.status === USER_STATUS.LOCKED) {
-      throw new AppError('Account is locked. Please contact administrator', 403);
+if (user.status === USER_STATUS.LOCKED) {
+      throw new AppError('Tài khoản đã bị khóa', 403);
     }
 
-    // Verify password
-    const isPasswordValid = await comparePassword(password, user.password);
-    
+const isPasswordValid = await comparePassword(password, user.password);
+
     if (!isPasswordValid) {
-      throw new AppError('Invalid email or password', 401);
+      throw new AppError('Sai tài khoản hoặc mật khẩu', 401);
     }
 
-    // Generate tokens
-    const tokenPayload = {
+const tokenPayload = {
       id: user.id,
       email: user.email,
       role: user.role
@@ -39,8 +36,7 @@ export class LoginUseCase {
     const accessToken = generateToken(tokenPayload);
     const refreshToken = generateRefreshToken(tokenPayload);
 
-    // Return user data without password
-    const userData = user.toJSON();
+const userData = user.toJSON();
 
     return {
       user: userData,
@@ -49,4 +45,3 @@ export class LoginUseCase {
     };
   }
 }
-

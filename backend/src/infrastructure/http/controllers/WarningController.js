@@ -7,13 +7,12 @@ import { successResponse } from '../../../shared/utils/response.js';
 export class WarningController {
   async create(req, res, next) {
     try {
+      const data = { ...req.body };
+      if (req.user && (req.user.role === 'coordinator' || req.user.role === 'officer')) {
+        data.province = req.user.province ? req.user.province.trim() : null;
+      }
       const createUseCase = new CreateWarningUseCase();
-      const warning = await createUseCase.execute(
-        req.body,
-        req.user?.role,
-        req.user?.district,
-        req.user?.province
-      );
+      const warning = await createUseCase.execute(data);
       return successResponse(res, warning, 'Warning created successfully', 201);
     } catch (error) {
       next(error);
@@ -22,13 +21,19 @@ export class WarningController {
 
   async getAll(req, res, next) {
     try {
+      const query = { ...req.query };
+
+      if (req.user && (req.user.role === 'coordinator' || req.user.role === 'officer')) {
+        delete query.province;
+        const userProv = req.user.province ? req.user.province.trim() : null;
+        query.$or = [
+          { province: userProv },
+          { province: { $in: [null, ""] } }
+        ];
+      }
+
       const getUseCase = new GetWarningsUseCase();
-      const warnings = await getUseCase.execute(
-        req.query,
-        req.user?.role,
-        req.user?.district,
-        req.user?.province
-      );
+      const warnings = await getUseCase.execute(query);
       return successResponse(res, warnings, 'Warnings retrieved successfully');
     } catch (error) {
       next(error);
@@ -37,14 +42,12 @@ export class WarningController {
 
   async update(req, res, next) {
     try {
+      const data = { ...req.body };
+      if (req.user && (req.user.role === 'coordinator' || req.user.role === 'officer')) {
+        data.province = req.user.province ? req.user.province.trim() : null;
+      }
       const updateUseCase = new UpdateWarningUseCase();
-      const warning = await updateUseCase.execute(
-        req.params.id,
-        req.body,
-        req.user?.role,
-        req.user?.district,
-        req.user?.province
-      );
+      const warning = await updateUseCase.execute(req.params.id, data);
       return successResponse(res, warning, 'Warning updated successfully');
     } catch (error) {
       next(error);
@@ -54,15 +57,10 @@ export class WarningController {
   async delete(req, res, next) {
     try {
       const deleteUseCase = new DeleteWarningUseCase();
-      await deleteUseCase.execute(
-        req.params.id,
-        req.user?.role,
-        req.user?.district
-      );
+      await deleteUseCase.execute(req.params.id);
       return successResponse(res, null, 'Warning deleted successfully');
     } catch (error) {
       next(error);
     }
   }
 }
-

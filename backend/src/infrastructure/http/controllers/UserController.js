@@ -21,8 +21,14 @@ export class UserController {
 
   async getAll(req, res, next) {
     try {
+      const query = { ...req.query };
+
+if (req.user && req.user.role === 'coordinator') {
+        query.province = req.user.province;
+      }
+
       const getUseCase = new GetUsersUseCase();
-      const users = await getUseCase.execute(req.query);
+      const users = await getUseCase.execute(query);
       return successResponse(res, users, 'Users retrieved successfully');
     } catch (error) {
       next(error);
@@ -89,4 +95,3 @@ export class UserController {
     }
   }
 }
-

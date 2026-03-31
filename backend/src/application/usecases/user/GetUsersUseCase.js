@@ -10,4 +10,3 @@ export class GetUsersUseCase {
     return users.map(user => user.toJSON());
   }
 }
-

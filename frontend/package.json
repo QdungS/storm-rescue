@@ -1,5 +1,5 @@
 {
-  "name": "landslide-system",
+  "name": "storm-rescue",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -14,6 +14,7 @@
     "axios": "^1.13.2",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.556.0",
+    "playwright": "^1.58.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-leaflet": "^5.0.0",

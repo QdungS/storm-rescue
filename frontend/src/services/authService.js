@@ -16,7 +16,7 @@ export const authService = {
   },
 
   loginGuest(guestInfo = {}) {
-    // guestInfo: không cần thiết nữa, guest không cần khai báo Tỉnh/Xã
+
     const guestUser = {
       name: guestInfo.name || 'Khách',
       role: 'guest'
@@ -49,6 +49,13 @@ export const authService = {
       return response.data;
     }
     return null;
+  },
+
+  async forgotPassword(email) {
+    return await api.post('/auth/forgot-password', { email });
+  },
+
+  async resetPassword(email, code, newPassword) {
+    return await api.post('/auth/reset-password', { email, code, newPassword });
   }
 };
-

@@ -16,4 +16,3 @@ export class RemoveSavedLocationUseCase {
     return updated.toJSON();
   }
 }
-

@@ -4,7 +4,7 @@ import { EmergencyContactModel } from '../mongoose/models/EmergencyContactModel.
 import { ISafetyRepository } from '../../../domain/repositories/ISafetyRepository.js';
 
 export class SafetyRepository extends ISafetyRepository {
-  // Safety Guides
+
   async createGuide(guideData) {
     const guide = await SafetyGuideModel.create(guideData);
     return this._guideToObject(guide);
@@ -30,8 +30,7 @@ export class SafetyRepository extends ISafetyRepository {
     return true;
   }
 
-  // Safe Zones
-  async createSafeZone(zoneData) {
+async createSafeZone(zoneData) {
     const zone = await SafeZoneModel.create(zoneData);
     return this._zoneToObject(zone);
   }
@@ -56,8 +55,7 @@ export class SafetyRepository extends ISafetyRepository {
     return true;
   }
 
-  // Emergency Contacts
-  async createContact(contactData) {
+async createContact(contactData) {
     const contact = await EmergencyContactModel.create(contactData);
     return this._contactToObject(contact);
   }
@@ -121,4 +119,3 @@ export class SafetyRepository extends ISafetyRepository {
     };
   }
 }
-

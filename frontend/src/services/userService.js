@@ -35,4 +35,3 @@ export const userService = {
     return await api.delete(`/users/me/locations/${locationId}`);
   }
 };
-

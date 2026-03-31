@@ -35,4 +35,3 @@ export class IUserRepository {
     throw new Error('Method removeSavedLocation() must be implemented');
   }
 }
-

@@ -7,16 +7,13 @@ import { ROLES } from '../../../shared/constants/roles.js';
 const router = express.Router();
 const warningController = new WarningController();
 
-// Public route with optional authentication (to filter by province for Officers)
 router.get('/', optionalAuthenticate, warningController.getAll.bind(warningController));
 
-// Protected routes
-router.post('/', authenticate, authorize(ROLES.ADMIN, ROLES.OFFICER), 
+router.post('/', authenticate, authorize(ROLES.ADMIN, ROLES.OFFICER, ROLES.COORDINATOR),
   warningController.create.bind(warningController));
-router.put('/:id', authenticate, authorize(ROLES.ADMIN, ROLES.OFFICER), 
+router.put('/:id', authenticate, authorize(ROLES.ADMIN, ROLES.OFFICER, ROLES.COORDINATOR),
   warningController.update.bind(warningController));
-router.delete('/:id', authenticate, authorize(ROLES.ADMIN, ROLES.OFFICER), 
+router.delete('/:id', authenticate, authorize(ROLES.ADMIN, ROLES.OFFICER, ROLES.COORDINATOR),
   warningController.delete.bind(warningController));
 
 export default router;
-

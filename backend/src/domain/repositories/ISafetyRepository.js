@@ -1,5 +1,5 @@
 export class ISafetyRepository {
-  // Safety Guides
+
   async createGuide(guideData) {
     throw new Error('Method createGuide() must be implemented');
   }
@@ -20,8 +20,7 @@ export class ISafetyRepository {
     throw new Error('Method deleteGuide() must be implemented');
   }
 
-  // Safe Zones
-  async createSafeZone(zoneData) {
+async createSafeZone(zoneData) {
     throw new Error('Method createSafeZone() must be implemented');
   }
 
@@ -41,8 +40,7 @@ export class ISafetyRepository {
     throw new Error('Method deleteSafeZone() must be implemented');
   }
 
-  // Emergency Contacts
-  async createContact(contactData) {
+async createContact(contactData) {
     throw new Error('Method createContact() must be implemented');
   }
 
@@ -62,4 +60,3 @@ export class ISafetyRepository {
     throw new Error('Method deleteContact() must be implemented');
   }
 }
-

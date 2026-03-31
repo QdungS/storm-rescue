@@ -18,4 +18,3 @@ export const warningService = {
     return await api.delete(`/warnings/${id}`);
   }
 };
-

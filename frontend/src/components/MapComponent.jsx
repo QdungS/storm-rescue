@@ -2,97 +2,92 @@ import React from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 
-// Icon cho điểm sạt lở - Màu sắc theo mức độ
-const getLandslideIcon = (level) => {
-  let color;
-  switch(level) {
-    case 1: color = '#52c41a'; break; // Xanh lá - Rủi ro thấp
-    case 2: color = '#fadb14'; break; // Vàng - Rủi ro trung bình
-    case 3: color = '#fa8c16'; break; // Cam - Rủi ro lớn
-    case 4: color = '#ff4d4f'; break; // Đỏ - Rủi ro rất lớn
-    case 5: color = '#000000'; break; // Đen - Rủi ro cấp thảm họa
-    default: color = '#52c41a'; break;
+const getRescueIcon = (priority, status) => {
+  let bgColor = '#ef4444';
+
+  if (status === 'Chờ tiếp nhận') {
+    bgColor = '#7c3aed';
+  } else {
+    if (priority === 'Khẩn cấp') bgColor = '#f97316';
+    if (priority === 'Bình thường') bgColor = '#22c55e';
   }
-  
-  // Đối với mức 5 (màu đen), cần border màu trắng rõ hơn để nhìn thấy
-  const borderColor = level === 5 ? '#ffffff' : 'white';
-  const borderWidth = level === 5 ? '3px' : '2px';
-  
+
   return L.divIcon({
-    className: 'custom-icon',
-    html: `<div style="background-color: ${color}; width: 20px; height: 20px; border-radius: 50%; border: ${borderWidth} solid ${borderColor}; box-shadow: 0 0 5px rgba(0,0,0,0.5);"></div>`,
+    className: `custom-icon ${(priority === 'Rất khẩn cấp' && status !== 'Chờ tiếp nhận') ? 'animate-pulse' : ''}`,
+    html: `<div style="background-color: ${bgColor}; width: 30px; height: 30px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px ${bgColor}; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 10px;">SOS</div>`,
+    iconAnchor: [15, 15]
   });
 };
 
-const MapComponent = ({ points }) => {
+const MapComponent = ({ rescues = [] }) => {
   return (
     <div className="w-full h-full absolute inset-0 z-0">
-      <MapContainer 
-        center={[15.5, 110.0]} // Tâm bản đồ ở giữa biển Đông
-        zoom={6}               // Mức zoom bao quát
+      <MapContainer
+        center={[15.5, 105.0]}
+        zoom={6}
         minZoom={5}
         style={{ height: "100%", width: "100%" }}
         zoomControl={false}
       >
-        {/* --- THAY ĐỔI LỚP BẢN ĐỒ TẠI ĐÂY --- */}
-        {/* Sử dụng Google Maps Hybrid (Vệ tinh + Tên đường/Địa danh) */}
         <TileLayer
           url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"
           attribution='&copy; Google Maps'
         />
-        
-        {/* Chỉ hiển thị các điểm sạt lở, KHÔNG CẦN code thủ công Hoàng Sa/Trường Sa nữa */}
-        {points.map((point) => (
-          <Marker 
-            key={point.id} 
-            position={[point.lat, point.lng]}
-            icon={getLandslideIcon(point.level)}
-          >
-            <Popup>
-              <div className="font-sans">
-                <h3 className="font-bold">{point.name}</h3>
-                <p>Mức độ: <span className={
-                  point.level === 5 ? "text-black font-bold" :
-                  point.level === 4 ? "text-red-500 font-bold" :
-                  point.level === 3 ? "text-orange-500 font-bold" :
-                  point.level === 2 ? "text-yellow-500 font-bold" :
-                  "text-green-500 font-bold"
-                }>{point.level}/5</span></p>
-                <p className="text-sm">{point.description}</p>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+
+        {}
+        {rescues.map((rescue) => {
+          if (rescue.lat && rescue.lng) {
+            return (
+              <Marker
+                key={`rs-${rescue.id}`}
+                position={[rescue.lat, rescue.lng]}
+                icon={getRescueIcon(rescue.priority, rescue.status)}
+              >
+                <Popup>
+                  <div className="font-sans">
+                    <h3 className="font-bold text-red-600 flex items-center gap-1">YÊU CẦU CỨU HỘ</h3>
+                    <p className="text-sm my-1"><strong>Liên hệ:</strong> {rescue.contactName} ({rescue.contactPhone})</p>
+                    <p className="text-sm my-1"><strong>Số người kẹt:</strong> {rescue.trappedCount}</p>
+                    <p className="text-sm my-1"><strong>Ưu tiên:</strong>
+                      <span style={{
+                        color: rescue.status === 'Chờ tiếp nhận' ? '#7c3aed' : (rescue.priority === 'Rất khẩn cấp' ? '#ef4444' : rescue.priority === 'Khẩn cấp' ? '#f97316' : '#22c55e'),
+                        fontWeight: 'bold',
+                      }}> {rescue.status === 'Chờ tiếp nhận' ? 'Chờ tiếp nhận' : rescue.priority}</span>
+                    </p>
+                    <p className="text-sm mt-2 pt-2 border-t">{rescue.description}</p>
+                  </div>
+                </Popup>
+              </Marker>
+            )
+          }
+          return null;
+        })}
 
       </MapContainer>
 
-      {/* Tiêu đề nổi */}
+      {}
       <div className="absolute top-4 left-4 z-[1000] bg-white/90 px-4 py-2 rounded shadow-md border-l-4 border-blue-600 backdrop-blur-sm">
-        <h2 className="font-bold text-gray-800 text-sm uppercase">Bản đồ vệ tinh giám sát</h2>
+        <h2 className="font-bold text-gray-800 text-sm uppercase">Bản đồ Điều phối Cứu hộ</h2>
       </div>
 
-      {/* Chú thích */}
+      {}
       <div className="absolute bottom-4 right-4 z-[1000] bg-white/90 p-3 rounded shadow-md backdrop-blur-sm">
-        <div className="text-xs font-bold mb-2">Mức độ nguy hiểm</div>
-        <div className="flex items-center text-xs mb-1">
-          <span className="w-3 h-3 rounded-full mr-2 border-2 border-white" style={{backgroundColor: '#000000', width: '12px', height: '12px', display: 'inline-block'}}></span>
-          Rủi ro cấp thảm họa
+        <div className="text-xs font-bold mb-2 text-center border-b pb-1">Chú thích</div>
+        <div className="flex items-center text-xs mb-2">
+          <span className="w-5 h-5 rounded-full mr-2 bg-[#ef4444] flex items-center justify-center text-white font-bold animate-pulse" style={{ fontSize: '8px', border: '1px solid white' }}>SOS</span>
+          <span className="font-bold text-[#ef4444]">Rất khẩn cấp</span>
+        </div>
+        <div className="flex items-center text-xs mb-2">
+          <span className="w-5 h-5 rounded-full mr-2 bg-[#f97316] flex items-center justify-center text-white font-bold" style={{ fontSize: '8px', border: '1px solid white' }}>SOS</span>
+          <span className="font-bold text-[#f97316]">Khẩn cấp</span>
         </div>
         <div className="flex items-center text-xs mb-1">
-          <span className="w-3 h-3 rounded-full mr-2" style={{backgroundColor: '#ff4d4f', width: '12px', height: '12px', display: 'inline-block'}}></span>
-          Rủi ro rất lớn
+          <span className="w-5 h-5 rounded-full mr-2 bg-[#22c55e] flex items-center justify-center text-white font-bold" style={{ fontSize: '8px', border: '1px solid white' }}>SOS</span>
+          <span className="text-[#22c55e]">Bình thường</span>
         </div>
-        <div className="flex items-center text-xs mb-1">
-          <span className="w-3 h-3 rounded-full mr-2" style={{backgroundColor: '#fa8c16', width: '12px', height: '12px', display: 'inline-block'}}></span>
-          Rủi ro lớn
-        </div>
-        <div className="flex items-center text-xs mb-1">
-          <span className="w-3 h-3 rounded-full mr-2" style={{backgroundColor: '#fadb14', width: '12px', height: '12px', display: 'inline-block'}}></span>
-          Rủi ro trung bình
-        </div>
-        <div className="flex items-center text-xs">
-          <span className="w-3 h-3 rounded-full mr-2" style={{backgroundColor: '#52c41a', width: '12px', height: '12px', display: 'inline-block'}}></span>
-          Rủi ro thấp
+        <div className="flex items-center text-xs mt-2 pt-2 border-t">
+          <span className="w-5 h-5 rounded-full mr-2 bg-[#7c3aed] flex items-center justify-center text-white font-bold" style={{ fontSize: '8px', border: '1px solid white' }}>SOS</span>
+          <span className="font-bold text-purple-600 ">Chờ tiếp nhận</span>
         </div>
       </div>
     </div>
