@@ -24,8 +24,3 @@ export const WARNING_LEVEL = {
   INFO: 'info'
 };
 
-export const LOCATION_TYPE = {
-  HOME: 'home',
-  WORK: 'work',
-  OTHER: 'other'
-};

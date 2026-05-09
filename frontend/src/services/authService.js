@@ -11,9 +11,6 @@ export const authService = {
     return response;
   },
 
-  async register(userData) {
-    return await api.post('/auth/register', userData);
-  },
 
   loginGuest(guestInfo = {}) {
 

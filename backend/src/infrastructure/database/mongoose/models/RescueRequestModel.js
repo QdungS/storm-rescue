@@ -20,21 +20,15 @@ const rescueRequestSchema = new mongoose.Schema({
   },
   previousContact: {
     contactName: { type: String, trim: true },
-    sourceLine: { type: String, trim: true },
     time: { type: String, trim: true },
     phone: { type: String, trim: true }
   },
   spamReports: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  source: {
-    type: String,
-    enum: ['user', 'social', 'news'],
-    default: 'user'
-  },
   isDuplicate: { type: Boolean, default: false },
   description: { type: String, trim: true },
   status: {
     type: String,
-    enum: ['Chờ tiếp nhận', 'Đang xử lý', 'Đã được cứu', 'Từ chối'],
+    enum: ['Chờ tiếp nhận', 'Đang xử lý', 'Đã giải quyết', 'Từ chối'],
     default: 'Chờ tiếp nhận'
   },
   notes: { type: String, trim: true },

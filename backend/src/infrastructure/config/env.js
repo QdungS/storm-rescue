@@ -12,9 +12,5 @@ export const config = {
     refreshSecret: process.env.JWT_REFRESH_SECRET || 'default-refresh-secret',
     refreshExpire: process.env.JWT_REFRESH_EXPIRE || '30d'
   },
-  upload: {
-    path: process.env.UPLOAD_PATH || './uploads',
-    maxFileSize: parseInt(process.env.MAX_FILE_SIZE) || 5242880
-  },
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173'
 };

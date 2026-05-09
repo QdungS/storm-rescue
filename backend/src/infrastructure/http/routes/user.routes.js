@@ -7,12 +7,7 @@ import { ROLES } from '../../../shared/constants/roles.js';
 const router = express.Router();
 const userController = new UserController();
 
-router.get('/me/locations', authenticate, authorize(ROLES.CITIZEN),
-  userController.getMyLocations.bind(userController));
-router.post('/me/locations', authenticate, authorize(ROLES.CITIZEN),
-  userController.addLocation.bind(userController));
-router.delete('/me/locations/:locationId', authenticate, authorize(ROLES.CITIZEN),
-  userController.removeLocation.bind(userController));
+
 
 router.get('/', authenticate, authorize(ROLES.ADMIN, ROLES.COORDINATOR),
   userController.getAll.bind(userController));

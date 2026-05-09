@@ -1,5 +1,5 @@
 export class RescueRequest {
-  constructor({ id, contactName, contactPhone, contactEmail, rescueCode, lat, lng, demographics, trappedCount, priority, previousContact, spamReports, description, status, notes, province, district, source, isDuplicate, assignedTo, coordinatedBy, citizenId, processingAt, rescuedAt, updatedAt, createdAt }) {
+  constructor({ id, contactName, contactPhone, contactEmail, rescueCode, lat, lng, demographics, trappedCount, priority, previousContact, spamReports, description, status, notes, province, district, isDuplicate, assignedTo, coordinatedBy, citizenId, processingAt, rescuedAt, updatedAt, createdAt }) {
     this.id = id;
     this.contactName = contactName;
     this.contactPhone = contactPhone;
@@ -17,7 +17,6 @@ export class RescueRequest {
     this.notes = notes;
     this.province = province;
     this.district = district;
-    this.source = source || 'user';
     this.isDuplicate = isDuplicate || false;
     this.assignedTo = assignedTo;
     this.coordinatedBy = coordinatedBy;

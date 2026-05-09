@@ -5,15 +5,12 @@ import { safetyService } from '../services/safetyService';
 import { useAuth } from '../context/AuthContext';
 
 const PROVINCES = [
-  'An Giang', 'Bà Rịa - Vũng Tàu', 'Bắc Giang', 'Bắc Kạn', 'Bạc Liêu', 'Bắc Ninh',
-  'Bến Tre', 'Bình Định', 'Bình Dương', 'Bình Phước', 'Bình Thuận', 'Cà Mau', 'Cần Thơ',
-  'Cao Bằng', 'Đà Nẵng', 'Đắk Lắk', 'Đắk Nông', 'Điện Biên', 'Đồng Nai', 'Đồng Tháp',
-  'Gia Lai', 'Hà Giang', 'Hà Nam', 'Hà Nội', 'Hà Tĩnh', 'Hải Dương', 'Hải Phòng', 'Hậu Giang',
-  'Hòa Bình', 'Hưng Yên', 'Khánh Hòa', 'Kiên Giang', 'Kon Tum', 'Lai Châu', 'Lâm Đồng', 'Lạng Sơn',
-  'Lào Cai', 'Long An', 'Nam Định', 'Nghệ An', 'Ninh Bình', 'Ninh Thuận', 'Phú Thọ', 'Phú Yên',
-  'Quảng Bình', 'Quảng Nam', 'Quảng Ngãi', 'Quảng Ninh', 'Quảng Trị', 'Sóc Trăng', 'Sơn La',
-  'Tây Ninh', 'Thái Bình', 'Thái Nguyên', 'Thanh Hóa', 'Thừa Thiên Huế', 'Tiền Giang',
-  'TP Hồ Chí Minh', 'Trà Vinh', 'Tuyên Quang', 'Vĩnh Long', 'Vĩnh Phúc', 'Yên Bái', 'Bình Giang'
+  'An Giang', 'Bắc Ninh', 'Cà Mau', 'Cao Bằng', 'Cần Thơ', 'Đà Nẵng',
+  'Đắk Lắk', 'Điện Biên', 'Đồng Nai', 'Đồng Tháp', 'Gia Lai', 'Hà Nội',
+  'Hà Tĩnh', 'Hải Phòng', 'Huế', 'Hưng Yên', 'Khánh Hòa', 'Lai Châu',
+  'Lâm Đồng', 'Lạng Sơn', 'Lào Cai', 'Nghệ An', 'Ninh Bình', 'Phú Thọ',
+  'Quảng Ngãi', 'Quảng Ninh', 'Quảng Trị', 'Sơn La', 'Tây Ninh',
+  'Thái Nguyên', 'Thanh Hóa', 'TP Hồ Chí Minh', 'Tuyên Quang', 'Vĩnh Long'
 ];
 
 const { Title, Paragraph, Text } = Typography;
@@ -24,10 +21,12 @@ const SafetyInfo = () => {
   const [safeZones, setSafeZones] = useState([]);
   const [contacts, setContacts] = useState([]);
   const [selectedZoneProvince, setSelectedZoneProvince] = useState(null);
+  const [selectedContactProvince, setSelectedContactProvince] = useState(null);
 
   useEffect(() => {
-    if (user?.province && !selectedZoneProvince) {
-      setSelectedZoneProvince(user.province);
+    if (user?.province) {
+      if (!selectedZoneProvince) setSelectedZoneProvince(user.province);
+      if (!selectedContactProvince) setSelectedContactProvince(user.province);
     }
   }, [user]);
 
@@ -40,7 +39,7 @@ const SafetyInfo = () => {
           safetyService.getContacts()
         ]);
 
-setGuides(guidesData || []);
+        setGuides(guidesData || []);
         setSafeZones(zonesData || []);
         setContacts(contactsData || []);
       } catch (error) {
@@ -53,7 +52,7 @@ setGuides(guidesData || []);
     fetchData();
   }, []);
 
-const GuidesTab = () => (
+  const GuidesTab = () => (
     <div className="max-w-3xl mx-auto">
       {guides.length === 0 ? (
         <div className="text-center text-gray-500 py-8">Chưa có hướng dẫn nào.</div>
@@ -74,7 +73,7 @@ const GuidesTab = () => (
     </div>
   );
 
-const SafeZonesTab = () => {
+  const SafeZonesTab = () => {
     const filteredZones = safeZones.filter(z => !selectedZoneProvince || z.province === selectedZoneProvince);
     return (
       <div>
@@ -121,34 +120,55 @@ const SafeZonesTab = () => {
     );
   };
 
-const ContactsTab = () => (
-    contacts.length === 0 ? (
-      <div className="text-center text-gray-500 py-8">Chưa có liên hệ khẩn cấp nào.</div>
-    ) : (
-      <List
-        grid={{ gutter: 16, column: 1 }}
-        dataSource={contacts}
-        renderItem={(item) => (
-          <List.Item>
-            <Card className="shadow-sm bg-red-50 border-red-100">
-              <div className="flex items-center justify-between gap-6">
-                <div className="flex-1">
-                  <Title level={4} className="m-0 text-red-700 mb-1">{item.phone}</Title>
-                  <Text className="text-gray-600">{item.name}</Text>
-                  {item.province && <Text type="secondary" className="block text-xs mt-1">{item.province}</Text>}
-                </div>
-                <div className="flex-shrink-0">
-                  <Button type="primary" danger shape="round" icon={<Phone size={16} />} size="large">
-                    Gọi ngay
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          </List.Item>
+  const ContactsTab = () => {
+    const filteredContacts = contacts.filter(c => !selectedContactProvince || c.province === selectedContactProvince);
+    return (
+      <div>
+        <div className="mb-6 bg-white-50 p-4 rounded-lg flex items-center gap-4">
+          <div className="flex items-center text-red-700 font-medium">
+            <Filter size={18} className="mr-2" />
+            Lọc theo tỉnh:
+          </div>
+          <Select
+            showSearch
+            allowClear
+            className="w-64"
+            placeholder="Chọn tỉnh/thành phố..."
+            value={selectedContactProvince}
+            onChange={v => setSelectedContactProvince(v)}
+            options={PROVINCES.map(p => ({ label: p, value: p }))}
+          />
+        </div>
+
+        {filteredContacts.length === 0 ? (
+          <div className="text-center text-gray-500 py-8">Chưa có liên hệ khẩn cấp nào ở khu vực này.</div>
+        ) : (
+          <List
+            grid={{ gutter: 16, column: 1 }}
+            dataSource={filteredContacts}
+            renderItem={(item) => (
+              <List.Item>
+                <Card className="shadow-sm bg-red-50 border-red-100">
+                  <div className="flex items-center justify-between gap-6">
+                    <div className="flex-1">
+                      <Title level={4} className="m-0 text-red-700 mb-1">{item.phone}</Title>
+                      <Text className="text-gray-600">{item.name}</Text>
+                      {item.province && <Text type="secondary" className="block text-xs mt-1">{item.province}{item.district ? ` - ${item.district}` : ''}</Text>}
+                    </div>
+                    <div className="flex-shrink-0">
+                      <Button type="primary" danger shape="round" icon={<Phone size={16} />} size="large">
+                        Gọi ngay
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              </List.Item>
+            )}
+          />
         )}
-      />
-    )
-  );
+      </div>
+    );
+  };
 
 const items = [
     {

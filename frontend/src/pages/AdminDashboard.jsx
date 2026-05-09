@@ -10,15 +10,12 @@ const { TabPane } = Tabs;
 const { TextArea } = Input;
 
 const PROVINCES = [
-  'An Giang', 'Bà Rịa - Vũng Tàu', 'Bắc Giang', 'Bắc Kạn', 'Bạc Liêu', 'Bắc Ninh',
-  'Bến Tre', 'Bình Định', 'Bình Dương', 'Bình Phước', 'Bình Thuận', 'Cà Mau', 'Cần Thơ',
-  'Cao Bằng', 'Đà Nẵng', 'Đắk Lắk', 'Đắk Nông', 'Điện Biên', 'Đồng Nai', 'Đồng Tháp',
-  'Gia Lai', 'Hà Giang', 'Hà Nam', 'Hà Nội', 'Hà Tĩnh', 'Hải Dương', 'Hải Phòng', 'Hậu Giang',
-  'Hòa Bình', 'Hưng Yên', 'Khánh Hòa', 'Kiên Giang', 'Kon Tum', 'Lai Châu', 'Lâm Đồng', 'Lạng Sơn',
-  'Lào Cai', 'Long An', 'Nam Định', 'Nghệ An', 'Ninh Bình', 'Ninh Thuận', 'Phú Thọ', 'Phú Yên',
-  'Quảng Bình', 'Quảng Nam', 'Quảng Ngãi', 'Quảng Ninh', 'Quảng Trị', 'Sóc Trăng', 'Sơn La',
-  'Tây Ninh', 'Thái Bình', 'Thái Nguyên', 'Thanh Hóa', 'Thừa Thiên Huế', 'Tiền Giang',
-  'TP Hồ Chí Minh', 'Trà Vinh', 'Tuyên Quang', 'Vĩnh Long', 'Vĩnh Phúc', 'Yên Bái', 'Bình Giang'
+  'An Giang', 'Bắc Ninh', 'Cà Mau', 'Cao Bằng', 'Cần Thơ', 'Đà Nẵng',
+  'Đắk Lắk', 'Điện Biên', 'Đồng Nai', 'Đồng Tháp', 'Gia Lai', 'Hà Nội',
+  'Hà Tĩnh', 'Hải Phòng', 'Huế', 'Hưng Yên', 'Khánh Hòa', 'Lai Châu',
+  'Lâm Đồng', 'Lạng Sơn', 'Lào Cai', 'Nghệ An', 'Ninh Bình', 'Phú Thọ',
+  'Quảng Ngãi', 'Quảng Ninh', 'Quảng Trị', 'Sơn La', 'Tây Ninh',
+  'Thái Nguyên', 'Thanh Hóa', 'TP Hồ Chí Minh', 'Tuyên Quang', 'Vĩnh Long'
 ];
 
 const AdminDashboard = () => {
@@ -29,6 +26,8 @@ const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [safeZones, setSafeZones] = useState([]);
   const [contacts, setContacts] = useState([]);
+  const [userFilterProvince, setUserFilterProvince] = useState('');
+  const [userFilterAddress, setUserFilterAddress] = useState('');
   const [loading, setLoading] = useState(false);
 
   const fetchData = async () => {
@@ -57,6 +56,18 @@ const AdminDashboard = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const filteredUsers = useMemo(() => {
+    return users.filter(u => {
+      if (u.role === 'citizen') return false;
+
+      const matchProvince = !userFilterProvince || u.province === userFilterProvince;
+      const matchAddress = !userFilterAddress ||
+        (u.district && u.district.toLowerCase().includes(userFilterAddress.toLowerCase()));
+
+      return matchProvince && matchAddress;
+    });
+  }, [users, userFilterProvince, userFilterAddress]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('');
@@ -168,7 +179,6 @@ const AdminDashboard = () => {
   const userColumns = [
     { title: 'Họ tên', dataIndex: 'name', key: 'name', render: t => <b>{t}</b> },
     { title: 'Email', dataIndex: 'email', key: 'email' },
-    { title: 'CCCD', dataIndex: 'cccd', key: 'cccd', render: c => c || '-' },
     { title: 'Tỉnh/Thành phố', dataIndex: 'province', key: 'province', render: p => p || '-' },
     { title: 'Địa chỉ', dataIndex: 'district', key: 'district', render: d => d || '-' },
     { title: 'SĐT', dataIndex: 'phone', key: 'phone', render: p => p || '-' },
@@ -190,14 +200,28 @@ const AdminDashboard = () => {
       title: 'Hành động', key: 'action', render: (_, r) => (
         <Space>
           <Button size="small" icon={<Edit size={14} />} onClick={() => openModal('user', r)} />
-          <Button
-            size="small"
-            icon={r.status === 'active' ? <Lock size={14} /> : <Unlock size={14} />}
-            danger={r.status === 'active'}
-            onClick={() => toggleUserLock(r)}
-            title={r.status === 'active' ? "Khóa tài khoản" : "Mở khóa"}
-          />
-          <Popconfirm title="Xóa tài khoản này?" onConfirm={() => handleDelete('user', r.id)}>
+          <Popconfirm
+            title={r.status === 'active' ? "Khóa tài khoản này?" : "Mở khóa tài khoản này?"}
+            description={r.status === 'active' ? "Người dùng này sẽ không thể đăng nhập vào hệ thống." : "Người dùng này sẽ có thể đăng nhập trở lại."}
+            onConfirm={() => toggleUserLock(r)}
+            okText="Xác nhận"
+            cancelText="Hủy"
+          >
+            <Button
+              size="small"
+              icon={r.status === 'active' ? <Lock size={14} /> : <Unlock size={14} />}
+              danger={r.status === 'active'}
+              title={r.status === 'active' ? "Khóa tài khoản" : "Mở khóa"}
+            />
+          </Popconfirm>
+          <Popconfirm
+            title="Xóa tài khoản này?"
+            description="Hành động này không thể hoàn tác. Mọi dữ liệu liên quan đến người dùng này sẽ bị xóa."
+            onConfirm={() => handleDelete('user', r.id)}
+            okText="Xác nhận xóa"
+            cancelText="Hủy"
+            okButtonProps={{ danger: true }}
+          >
             <Button size="small" danger icon={<Trash2 size={14} />} />
           </Popconfirm>
         </Space>
@@ -226,7 +250,14 @@ const AdminDashboard = () => {
       title: 'Hành động', key: 'action', render: (_, r) => (
         <Space>
           <Button icon={<Edit size={14} />} onClick={() => openModal('warning', r)} />
-          <Popconfirm title="Xóa cảnh báo này?" description="Hành động này không thể hoàn tác." onConfirm={() => handleDelete('warning', r.id)} okText="Xóa" cancelText="Hủy" okButtonProps={{ danger: true }}>
+          <Popconfirm
+            title="Xóa cảnh báo này?"
+            description="Hành động này không thể hoàn tác. Bản tin cảnh báo sẽ bị gỡ bỏ."
+            onConfirm={() => handleDelete('warning', r.id)}
+            okText="Xác nhận xóa"
+            cancelText="Hủy"
+            okButtonProps={{ danger: true }}
+          >
             <Button danger icon={<Trash2 size={14} />} />
           </Popconfirm>
         </Space>
@@ -241,7 +272,14 @@ const AdminDashboard = () => {
       title: 'Hành động', key: 'action', render: (_, r) => (
         <Space>
           <Button icon={<Edit size={14} />} onClick={() => openModal('guide', r)} />
-          <Popconfirm title="Xóa hướng dẫn này?" description="Hành động này không thể hoàn tác." onConfirm={() => handleDelete('guide', r.id)} okText="Xóa" cancelText="Hủy" okButtonProps={{ danger: true }}>
+          <Popconfirm
+            title="Xóa hướng dẫn này?"
+            description="Hành động này không thể hoàn tác. Tài liệu hướng dẫn sẽ bị xóa."
+            onConfirm={() => handleDelete('guide', r.id)}
+            okText="Xác nhận xóa"
+            cancelText="Hủy"
+            okButtonProps={{ danger: true }}
+          >
             <Button danger icon={<Trash2 size={14} />} />
           </Popconfirm>
         </Space>
@@ -260,7 +298,14 @@ const AdminDashboard = () => {
       title: 'Hành động', key: 'action', render: (_, r) => (
         <Space>
           <Button icon={<Edit size={14} />} onClick={() => openModal('safeZone', r)} />
-          <Popconfirm title="Xóa khu vực an toàn này?" description="Hành động này không thể hoàn tác." onConfirm={() => handleDelete('safeZone', r.id)} okText="Xóa" cancelText="Hủy" okButtonProps={{ danger: true }}>
+          <Popconfirm
+            title="Xóa khu vực an toàn này?"
+            description="Hành động này không thể hoàn tác. Thông tin điểm an toàn sẽ bị xóa."
+            onConfirm={() => handleDelete('safeZone', r.id)}
+            okText="Xác nhận xóa"
+            cancelText="Hủy"
+            okButtonProps={{ danger: true }}
+          >
             <Button danger icon={<Trash2 size={14} />} />
           </Popconfirm>
         </Space>
@@ -277,7 +322,14 @@ const AdminDashboard = () => {
       title: 'Hành động', key: 'action', render: (_, r) => (
         <Space>
           <Button icon={<Edit size={14} />} onClick={() => openModal('contact', r)} />
-          <Popconfirm title="Xóa liên hệ khẩn cấp này?" description="Hành động này không thể hoàn tác." onConfirm={() => handleDelete('contact', r.id)} okText="Xóa" cancelText="Hủy" okButtonProps={{ danger: true }}>
+          <Popconfirm
+            title="Xóa liên hệ khẩn cấp này?"
+            description="Hành động này không thể hoàn tác. Số điện thoại này sẽ bị xóa khỏi danh sách."
+            onConfirm={() => handleDelete('contact', r.id)}
+            okText="Xác nhận xóa"
+            cancelText="Hủy"
+            okButtonProps={{ danger: true }}
+          >
             <Button danger icon={<Trash2 size={14} />} />
           </Popconfirm>
         </Space>
@@ -303,7 +355,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="bg-gray-50 p-6 shadow-inner h-full overflow-auto">
-      <h2 className="text-3xl font-bold mb-6 text-gray-800 uppercase tracking-wide">Trung tâm Điều phối & Quản trị</h2>
+      <h2 className="text-3xl font-bold mb-6 text-gray-800 uppercase tracking-wide">Trung tâm Quản trị hệ thống</h2>
 
       <Tabs defaultActiveKey="1" type="card">
 
@@ -311,8 +363,36 @@ const AdminDashboard = () => {
 
         { }
         <TabPane tab={<span><Users size={16} className="inline mr-1" /> Tài khoản</span>} key="2">
-          <Button type="primary" className="mb-4 bg-purple-600" icon={<Plus size={16} />} onClick={() => openModal('user')}>Tạo tài khoản mới</Button>
-          <Table columns={userColumns} dataSource={users.filter(u => u.role !== 'citizen')} rowKey="id" pagination={{ pageSize: 10 }} />
+          <Card size="small" className="shadow-sm border-t-4 border-t-purple-500 mb-4">
+            <Row gutter={16} justify="start">
+              <Col span={6} md={3}><Statistic title={<span className="text-xs">Đội cứu hộ</span>} value={userStats.officer} valueStyle={{ fontSize: '20px' }} /></Col>
+              <Col span={6} md={3}><Statistic title={<span className="text-xs">Điều phối viên</span>} value={userStats.coordinator} valueStyle={{ fontSize: '20px' }} /></Col>
+              <Col span={6} md={3}><Statistic title={<span className="text-xs">Quản trị viên</span>} value={userStats.admin} valueStyle={{ fontSize: '20px' }} /></Col>
+              <Col span={6} md={3}><Statistic title={<span className="text-xs">Bị khóa</span>} value={userStats.locked} valueStyle={{ fontSize: '20px', color: '#cf1322' }} /></Col>
+            </Row>
+          </Card>
+          <div className="flex gap-4 mb-4 items-center flex-wrap">
+            <Button type="primary" className="bg-purple-600" icon={<Plus size={16} />} onClick={() => openModal('user')}>Tạo tài khoản mới</Button>
+            <Select
+              showSearch
+              optionFilterProp="children"
+              style={{ width: 200 }}
+              placeholder="Lọc theo tỉnh..."
+              allowClear
+              value={userFilterProvince || undefined}
+              onChange={setUserFilterProvince}
+            >
+              {PROVINCES.map(p => <Select.Option key={p} value={p}>{p}</Select.Option>)}
+            </Select>
+            <Input
+              style={{ width: 250 }}
+              placeholder="Lọc theo địa chỉ..."
+              allowClear
+              value={userFilterAddress}
+              onChange={e => setUserFilterAddress(e.target.value)}
+            />
+          </div>
+          <Table columns={userColumns} dataSource={filteredUsers} rowKey="id" pagination={{ pageSize: 10 }} />
         </TabPane>
 
         { }
@@ -339,20 +419,6 @@ const AdminDashboard = () => {
           <Table columns={guideColumns} dataSource={guides} rowKey="id" pagination={{ pageSize: 5 }} />
         </TabPane>
 
-        { }
-        <TabPane tab={<span><BarChart3 size={16} className="inline mr-1" /> Thống kê tổng quan</span>} key="8">
-          <div className="space-y-6">
-
-            <Card title="Thống kê Tài khoản người dùng" className="shadow-sm border-t-4 border-t-purple-500">
-              <Row gutter={16}>
-                <Col flex={1}><Statistic title="Cán bộ Đội cứu hộ" value={userStats.officer} /></Col>
-                <Col flex={1}><Statistic title="Điều phối viên" value={userStats.coordinator} /></Col>
-                <Col flex={1}><Statistic title="Quản trị viên" value={userStats.admin} /></Col>
-                <Col flex={1}><Statistic title="Tài khoản bị khóa" value={userStats.locked} valueStyle={{ color: '#cf1322' }} /></Col>
-              </Row>
-            </Card>
-          </div>
-        </TabPane>
 
       </Tabs>
 
@@ -374,16 +440,15 @@ const AdminDashboard = () => {
           { }
           {modalType === 'user' && (
             <>
-              <Form.Item name="name" label="Họ và tên" rules={[{ required: true }]}><Input /></Form.Item>
-              <Form.Item name="email" label="Email" rules={[{ required: true, type: 'email' }]}><Input /></Form.Item>
+              <Form.Item name="name" label="Họ và tên" rules={[{ required: true, message: 'Vui lòng nhập họ và tên' }]}><Input /></Form.Item>
+              <Form.Item name="email" label="Email" rules={[{ required: true, type: 'email', message: 'Vui lòng nhập email' }]}><Input /></Form.Item>
               {!editingItem && (
-                <Form.Item name="password" label="Mật khẩu" rules={[{ required: true }]}><Input.Password /></Form.Item>
+                <Form.Item name="password" label="Mật khẩu" rules={[{ required: true, message: 'Vui lòng nhập mật khẩu' }]}><Input.Password /></Form.Item>
               )}
-              <Form.Item name="cccd" label="Căn cước công dân"><Input /></Form.Item>
               <Form.Item name="province" label="Tỉnh/Thành phố"><Select showSearch>{PROVINCES.map(p => <Select.Option key={p} value={p}>{p}</Select.Option>)}</Select></Form.Item>
               <Form.Item name="district" label="Địa chỉ"><Input /></Form.Item>
               <Form.Item name="phone" label="Số điện thoại"><Input /></Form.Item>
-              <Form.Item name="role" label="Vai trò" rules={[{ required: true }]}>
+              <Form.Item name="role" label="Vai trò" rules={[{ required: true, message: 'Vui lòng chọn vai trò' }]}>
                 <Select>
                   <Select.Option value="officer">Đội cứu hộ</Select.Option>
                   <Select.Option value="coordinator">Điều phối viên</Select.Option>
@@ -398,8 +463,8 @@ const AdminDashboard = () => {
 
           {modalType === 'warning' && (
             <>
-              <Form.Item name="title" label="Tiêu đề" rules={[{ required: true }]}><Input /></Form.Item>
-              <Form.Item name="content" label="Nội dung" rules={[{ required: true }]}><TextArea rows={3} /></Form.Item>
+              <Form.Item name="title" label="Tiêu đề" rules={[{ required: true, message: 'Vui lòng điền tiêu đề' }]}><Input /></Form.Item>
+              <Form.Item name="content" label="Nội dung" rules={[{ required: true, message: 'Vui lòng điền nội dung' }]}><TextArea rows={3} /></Form.Item>
               <Form.Item name="level" label="Mức độ" initialValue="warning">
                 <Select>
                   <Select.Option value="urgent">Khẩn cấp (Urgent)</Select.Option>
@@ -408,7 +473,7 @@ const AdminDashboard = () => {
                 </Select>
               </Form.Item>
               <div className="grid grid-cols-2 gap-2">
-                <Form.Item name="province" label="Tỉnh">
+                <Form.Item name="province" label="Tỉnh" rules={[{ required: true, message: 'Vui lòng chọn Tỉnh/Thành phố' }]}>
                   <Select showSearch>
                     {PROVINCES.map(p => <Select.Option key={p} value={p}>{p}</Select.Option>)}
                   </Select>
@@ -417,10 +482,9 @@ const AdminDashboard = () => {
               </div>
             </>
           )}
-
           {modalType === 'guide' && (
             <>
-              <Form.Item name="title" label="Tiêu đề" rules={[{ required: true }]}><Input /></Form.Item>
+              <Form.Item name="title" label="Tiêu đề" rules={[{ required: true, message: 'Vui lòng nhập tiêu đề' }]}><Input /></Form.Item>
               <Form.Item name="category" label="Thể loại"><Select><Select.Option value="Kỹ năng">Kỹ năng</Select.Option><Select.Option value="Tài liệu">Tài liệu</Select.Option></Select></Form.Item>
               <Form.Item name="content" label="Nội dung" rules={[{ required: true, message: 'Vui lòng nhập nội dung' }]}><TextArea rows={4} /></Form.Item>
             </>
@@ -428,8 +492,8 @@ const AdminDashboard = () => {
 
           {modalType === 'safeZone' && (
             <>
-              <Form.Item name="name" label="Tên" rules={[{ required: true }]}><Input /></Form.Item>
-              <Form.Item name="address" label="Địa chỉ" rules={[{ required: true }]}><Input /></Form.Item>
+              <Form.Item name="name" label="Tên khu vực" rules={[{ required: true, message: 'Vui lòng nhập tên khu vực' }]}><Input /></Form.Item>
+              <Form.Item name="address" label="Địa chỉ" rules={[{ required: true, message: 'Vui lòng nhập địa chỉ' }]}><Input /></Form.Item>
               <div className="grid grid-cols-2 gap-2">
                 <Form.Item name="province" label="Tỉnh"><Select showSearch>{PROVINCES.map(p => <Select.Option key={p} value={p}>{p}</Select.Option>)}</Select></Form.Item>
                 <Form.Item name="district" label="Phường/Xã"><Input /></Form.Item>
@@ -441,8 +505,8 @@ const AdminDashboard = () => {
 
           {modalType === 'contact' && (
             <>
-              <Form.Item name="name" label="Tên liên hệ" rules={[{ required: true }]}><Input /></Form.Item>
-              <Form.Item name="phone" label="Số điện thoại" rules={[{ required: true }]}><Input /></Form.Item>
+              <Form.Item name="name" label="Tên liên hệ" rules={[{ required: true, message: 'Vui lòng nhập tên liên hệ' }]}><Input /></Form.Item>
+              <Form.Item name="phone" label="Số điện thoại" rules={[{ required: true, message: 'Vui lòng nhập sđt' }]}><Input /></Form.Item>
               <div className="grid grid-cols-2 gap-2">
                 <Form.Item name="province" label="Tỉnh"><Select showSearch>{PROVINCES.map(p => <Select.Option key={p} value={p}>{p}</Select.Option>)}</Select></Form.Item>
                 <Form.Item name="district" label="Địa chỉ"><Input /></Form.Item>

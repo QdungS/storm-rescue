@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Upload, message, List, Tag, Steps, Modal, Typography, Tabs, Select, InputNumber } from 'antd';
+import { Form, Input, Button, message, List, Tag, Steps, Modal, Typography, Tabs, Select, InputNumber } from 'antd';
 import {
   EnvironmentOutlined,
   HistoryOutlined,
@@ -16,15 +16,12 @@ const { Text, Paragraph } = Typography;
 const { Option } = Select;
 
 const PROVINCES = [
-  'An Giang', 'Bà Rịa - Vũng Tàu', 'Bắc Giang', 'Bắc Kạn', 'Bạc Liêu', 'Bắc Ninh',
-  'Bến Tre', 'Bình Định', 'Bình Dương', 'Bình Phước', 'Bình Thuận', 'Cà Mau', 'Cần Thơ',
-  'Cao Bằng', 'Đà Nẵng', 'Đắk Lắk', 'Đắk Nông', 'Điện Biên', 'Đồng Nai', 'Đồng Tháp',
-  'Gia Lai', 'Hà Giang', 'Hà Nam', 'Hà Nội', 'Hà Tĩnh', 'Hải Dương', 'Hải Phòng', 'Hậu Giang',
-  'Hòa Bình', 'Hưng Yên', 'Khánh Hòa', 'Kiên Giang', 'Kon Tum', 'Lai Châu', 'Lâm Đồng', 'Lạng Sơn',
-  'Lào Cai', 'Long An', 'Nam Định', 'Nghệ An', 'Ninh Bình', 'Ninh Thuận', 'Phú Thọ', 'Phú Yên',
-  'Quảng Bình', 'Quảng Nam', 'Quảng Ngãi', 'Quảng Ninh', 'Quảng Trị', 'Sóc Trăng', 'Sơn La',
-  'Tây Ninh', 'Thái Bình', 'Thái Nguyên', 'Thanh Hóa', 'Thừa Thiên Huế', 'Tiền Giang',
-  'TP Hồ Chí Minh', 'Trà Vinh', 'Tuyên Quang', 'Vĩnh Long', 'Vĩnh Phúc', 'Yên Bái'
+  'An Giang', 'Bắc Ninh', 'Cà Mau', 'Cao Bằng', 'Cần Thơ', 'Đà Nẵng',
+  'Đắk Lắk', 'Điện Biên', 'Đồng Nai', 'Đồng Tháp', 'Gia Lai', 'Hà Nội',
+  'Hà Tĩnh', 'Hải Phòng', 'Huế', 'Hưng Yên', 'Khánh Hòa', 'Lai Châu',
+  'Lâm Đồng', 'Lạng Sơn', 'Lào Cai', 'Nghệ An', 'Ninh Bình', 'Phú Thọ',
+  'Quảng Ngãi', 'Quảng Ninh', 'Quảng Trị', 'Sơn La', 'Tây Ninh',
+  'Thái Nguyên', 'Thanh Hóa', 'TP Hồ Chí Minh', 'Tuyên Quang', 'Vĩnh Long'
 ];
 
 const CitizenReport = () => {
@@ -58,7 +55,11 @@ const CitizenReport = () => {
           lng: values.lng,
           demographics: values.demographics,
           trappedCount: values.trappedCount,
-          previousContact: values.previousContact,
+          previousContact: {
+            contactName: values.previousContact?.contactName,
+            time: values.previousContact?.time,
+            phone: values.previousContact?.phone
+          },
           description: values.description
         });
 
@@ -91,8 +92,8 @@ const CitizenReport = () => {
         <div className="bg-gray-50 p-4 border rounded mb-4">
           <h3 className="font-semibold mb-2">Số người mắc kẹt:</h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <Form.Item name="trappedCount" label="Tổng số người" initialValue={0} rules={[{ required: true, message: 'Nhập tổng số' }]}>
-              <InputNumber min={0} className="w-full" />
+            <Form.Item name="trappedCount" label="Tổng số người" initialValue={1} rules={[{ required: true, message: 'Nhập tổng số người' }]}>
+              <InputNumber min={1} className="w-full" />
             </Form.Item>
             <Form.Item name={['demographics', 'children']} label="Trẻ em" initialValue={0}>
               <InputNumber min={0} className="w-full" />
@@ -112,9 +113,6 @@ const CitizenReport = () => {
             <Form.Item name={['previousContact', 'contactName']} label="Tên người tiếp cận">
               <Input placeholder="Ví dụ: Nguyễn Văn B" />
             </Form.Item>
-            <Form.Item name={['previousContact', 'sourceLine']} label="Lực lượng (Công an/Quân đội...)">
-              <Input placeholder="Đội cứu trợ X..." />
-            </Form.Item>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <Form.Item name={['previousContact', 'time']} label="Thời gian tiếp cận">
@@ -129,7 +127,6 @@ const CitizenReport = () => {
         <Form.Item name="description" label="Mô tả chi tiết tình huống" rules={[{ required: true, message: 'Vui lòng mô tả tình huống chi tiết' }]}>
           <Input.TextArea rows={4} placeholder="Mô tả chi tiết (Thông tin chi tiết nếu gửi yêu cầu cứu hộ cho người khác) để đội cứu hộ nắm bắt tình hình..." />
         </Form.Item>
-
         <div className="grid grid-cols-2 gap-4">
           <Form.Item name="province" label="Tỉnh/Thành phố" rules={[{ required: true, message: 'Vui lòng chọn Tỉnh/Thành phố' }]}>
             <Select placeholder="Chọn tỉnh" showSearch filterOption={(input, option) => (option?.value ?? '').toLowerCase().includes(input.toLowerCase())}>
@@ -139,13 +136,16 @@ const CitizenReport = () => {
             </Select>
           </Form.Item>
           <Form.Item name="district" label="Địa Chỉ" rules={[{ required: true, message: 'Vui lòng điền địa chỉ' }]}>
-            <Input placeholder="Số nhà/Phường(Của người cần cứu hộ)" />
+            <Input placeholder="Số nhà, Phường" />
           </Form.Item>
+        </div>
+        <div className="-mt-5 mb-4">
+          <span className="text-gray-400 font-normal text-sm">(Vị trí người cần cứu hộ nếu gửi yêu cầu cứu hộ cho người khác)</span>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <Form.Item name="lat" label="Vĩ độ (*)" rules={[{ required: true, message: 'Vui lòng lấy vị trí' }]}><Input disabled /></Form.Item>
-          <Form.Item name="lng" label="Kinh độ (*)" rules={[{ required: true, message: 'Vui lòng lấy vị trí' }]}><Input disabled /></Form.Item>
+          <Form.Item name="lat" label="Vĩ độ" rules={[{ required: true, message: 'Vui lòng lấy vị trí' }]}><Input disabled /></Form.Item>
+          <Form.Item name="lng" label="Kinh độ" rules={[{ required: true, message: 'Vui lòng lấy vị trí' }]}><Input disabled /></Form.Item>
         </div>
 
         <Button type="dashed" icon={<EnvironmentOutlined />} onClick={handleGetLocation} className="w-full mb-4 border-blue-500 text-blue-600">
@@ -197,14 +197,14 @@ const CitizenReport = () => {
       switch (status) {
         case 'Chờ tiếp nhận': return 0;
         case 'Đang xử lý': return 1;
-        case 'Đã được cứu': return 2;
+        case 'Đã giải quyết': return 2;
         case 'Từ chối': return -1;
         default: return 0;
       }
     };
 
     const getStatusTag = (status) => {
-      const color = status === 'Đã được cứu' ? 'green' :
+      const color = status === 'Đã giải quyết' ? 'green' :
         status === 'Đang xử lý' ? 'blue' :
           status === 'Từ chối' ? 'red' : 'orange';
       return <Tag color={color}>{status}</Tag>;
@@ -276,7 +276,7 @@ const CitizenReport = () => {
                     icon: <ClockCircleOutlined />
                   },
                   {
-                    title: 'Đang xử lý (Đã có Đội cứu hộ nhận)',
+                    title: 'Đang xử lý (Đã có Lực lượng cứu hộ nhận)',
                     description: (
                       <>
                         Lực lượng cứu hộ đang trên đường tiếp cận.
@@ -286,7 +286,7 @@ const CitizenReport = () => {
                     icon: <SyncOutlined spin={selectedRequest.status === 'Đang xử lý'} />
                   },
                   {
-                    title: 'Đã được cứu',
+                    title: 'Đã giải quyết',
                     description: (
                       <>
                         Nhiệm vụ cứu hộ hoàn tất an toàn.

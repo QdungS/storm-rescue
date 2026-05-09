@@ -40,7 +40,7 @@ export class RescueRequestRepository extends IRescueRequestRepository {
   async findDuplicate(lat, lng, contactPhone, contactEmail) {
     const threshold = 0.001;
     const filter = {
-      status: { $ne: 'Đã được cứu' },
+      status: { $ne: 'Đã giải quyết' },
       $or: [
         { contactPhone: contactPhone }
       ]
@@ -77,7 +77,6 @@ export class RescueRequestRepository extends IRescueRequestRepository {
       notes: reqDoc.notes,
       province: reqDoc.province,
       district: reqDoc.district,
-      source: reqDoc.source,
       isDuplicate: reqDoc.isDuplicate,
       assignedTo: reqDoc.assignedTo,
       coordinatedBy: reqDoc.coordinatedBy,

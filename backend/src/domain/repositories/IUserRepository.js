@@ -11,10 +11,6 @@ export class IUserRepository {
     throw new Error('Method findByEmail() must be implemented');
   }
 
-  async findByCCCD(cccd) {
-    throw new Error('Method findByCCCD() must be implemented');
-  }
-
   async findAll(filters = {}) {
     throw new Error('Method findAll() must be implemented');
   }
@@ -25,13 +21,5 @@ export class IUserRepository {
 
   async delete(id) {
     throw new Error('Method delete() must be implemented');
-  }
-
-  async addSavedLocation(userId, location) {
-    throw new Error('Method addSavedLocation() must be implemented');
-  }
-
-  async removeSavedLocation(userId, locationId) {
-    throw new Error('Method removeSavedLocation() must be implemented');
   }
 }

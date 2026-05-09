@@ -20,18 +20,5 @@ export const userService = {
 
   async toggleLock(id) {
     return await api.put(`/users/${id}/toggle-lock`);
-  },
-
-  async getMyLocations() {
-    const response = await api.get('/users/me/locations');
-    return response.data || [];
-  },
-
-  async addLocation(locationData) {
-    return await api.post('/users/me/locations', locationData);
-  },
-
-  async removeLocation(locationId) {
-    return await api.delete(`/users/me/locations/${locationId}`);
   }
 };

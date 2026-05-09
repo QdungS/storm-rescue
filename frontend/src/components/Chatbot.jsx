@@ -1,89 +1,52 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Input, Avatar } from 'antd';
+import { Button, Input } from 'antd';
 import {
   MessageCircle,
   X,
   Send,
   Bot,
-  User,
   AlertTriangle,
   ShieldCheck,
   PhoneCall,
-  ChevronRight,
   Sparkles,
   Settings
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { safetyService } from '../services/safetyService';
 
-const PROVINCES = [
-  'An Giang', 'Bà Rịa - Vũng Tàu', 'Bắc Giang', 'Bắc Kạn', 'Bạc Liêu', 'Bắc Ninh',
-  'Bến Tre', 'Bình Định', 'Bình Dương', 'Bình Phước', 'Bình Thuận', 'Cà Mau', 'Cần Thơ',
-  'Cao Bằng', 'Đà Nẵng', 'Đắk Lắk', 'Đắk Nông', 'Điện Biên', 'Đồng Nai', 'Đồng Tháp',
-  'Gia Lai', 'Hà Giang', 'Hà Nam', 'Hà Nội', 'Hà Tĩnh', 'Hải Dương', 'Hải Phòng', 'Hậu Giang',
-  'Hòa Bình', 'Hưng Yên', 'Khánh Hòa', 'Kiên Giang', 'Kon Tum', 'Lai Châu', 'Lâm Đồng', 'Lạng Sơn',
-  'Lào Cai', 'Long An', 'Nam Định', 'Nghệ An', 'Ninh Bình', 'Ninh Thuận', 'Phú Thọ', 'Phú Yên',
-  'Quảng Bình', 'Quảng Nam', 'Quảng Ngãi', 'Quảng Ninh', 'Quảng Trị', 'Sóc Trăng', 'Sơn La',
-  'Tây Ninh', 'Thái Bình', 'Thái Nguyên', 'Thanh Hóa', 'Thừa Thiên Huế', 'Tiền Giang',
-  'TP Hồ Chí Minh', 'Trà Vinh', 'Tuyên Quang', 'Vĩnh Long', 'Vĩnh Phúc', 'Yên Bái', 'Bình Giang'
-];
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: "Xin chào! Tôi là Trợ lý Cứu hộ thông minh. Tôi có thể giúp gì cho bạn trong tình huống khẩn cấp này?",
+      text: 'Xin chào! Tôi là Trợ lý Cứu hộ AI 24/7. Tôi có thể giúp gì cho bạn? Hãy hỏi tôi về khu vực an toàn, số điện thoại khẩn cấp, hoặc cách gửi yêu cầu cứu hộ.',
       sender: 'ai',
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [safeZones, setSafeZones] = useState([]);
-  const [contacts, setContacts] = useState([]);
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [zones, phones] = await Promise.all([
-          safetyService.getSafeZones(),
-          safetyService.getContacts()
-        ]);
-        setSafeZones(zones || []);
-        setContacts(phones || []);
-      } catch (error) {
-        console.error('Chatbot failed to fetch safety data', error);
-      }
-    };
-    fetchData();
-  }, []);
-
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  const removeAccents = (str) => {
-    return str.normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/đ/g, 'd').replace(/Đ/g, 'D');
-  };
-
   const quickActions = [
     { label: 'Gửi cứu hộ khẩn cấp', icon: <AlertTriangle size={14} />, route: '/report' },
     { label: 'Tìm nơi an toàn', icon: <ShieldCheck size={14} />, route: '/safety' },
     { label: 'Số điện thoại hỗ trợ', icon: <PhoneCall size={14} />, route: '/safety' },
-    { label: 'Liên hệ Ban Quản Trị', icon: <Settings size={14} />, route: '#' },
+    { label: 'Liên hệ Ban Quản Trị', icon: <Settings size={14} />, action: 'chat' },
   ];
 
-  const handleSend = (text) => {
-    if (!text.trim()) return;
+  const handleSend = async (text) => {
+    if (!text.trim() || isTyping) return;
 
     const userMsg = {
       id: Date.now(),
@@ -92,66 +55,34 @@ const Chatbot = () => {
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
-    setMessages(prev => [...prev, userMsg]);
+    const updatedMessages = [...messages, userMsg];
+    setMessages(updatedMessages);
     setInputValue('');
     setIsTyping(true);
 
-    setTimeout(() => {
-      const lowerText = text.toLowerCase();
-      const normalizedInput = removeAccents(lowerText);
-      let aiText = "";
+    try {
+      // Gửi lịch sử hội thoại để AI nhớ ngữ cảnh (bỏ tin nhắn chào mừng đầu tiên)
+      const history = updatedMessages.slice(1, -1).map(msg => ({
+        sender: msg.sender,
+        text: msg.text,
+      }));
 
-      const foundProvince = PROVINCES.find(p => {
-        const normalizedProv = removeAccents(p.toLowerCase());
-        return lowerText.includes(p.toLowerCase()) || normalizedInput.includes(normalizedProv);
+      const response = await fetch(`${API_BASE_URL}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, history }),
       });
 
-      if (lowerText.includes('admin') || lowerText.includes('quản trị') || lowerText.includes('hỗ trợ kỹ thuật')) {
-        aiText = "Thông tin Ban Quản Trị Hệ Thống:\n\n Email: quangdung24092004@gmail.com \n Trang hỗ trợ: https://www.facebook.com/qdv2gogh/ \n\nChúng tôi luôn sẵn sàng hỗ trợ các vấn đề về tài khoản và vận hành hệ thống.";
-      }
-      else if (lowerText.includes('an toàn') || lowerText.includes('khu vực') || lowerText.includes('nơi ở') || normalizedInput.includes('an toan')) {
-        if (foundProvince) {
-          const matchedZones = safeZones.filter(z => z.province === foundProvince);
-          if (matchedZones.length > 0) {
-            aiText = `Tại ${foundProvince}, có các khu vực an toàn sau:\n` +
-              matchedZones.map(z => `• ${z.name}: ${z.address} (${z.status})`).join('\n');
-          } else {
-            aiText = `Hiện tại hệ thống chưa cập nhật khu vực an toàn cụ thể tại ${foundProvince}. Bạn nên liên hệ chính quyền địa phương ngay lập tức.`;
-          }
-        } else {
-          aiText = "Bạn đang ở tỉnh/thành phố nào? Hãy nhập tên tỉnh để tôi tìm khu vực an toàn gần bạn nhất (Ví dụ: 'Khu vực an toàn Hà Nội').";
-        }
-      }
-      else if (lowerText.includes('điện thoại') || lowerText.includes('liên hệ') || lowerText.includes('sđt') || lowerText.includes('gọi') || normalizedInput.includes('dien thoai')) {
-        if (foundProvince) {
-          const matchedContacts = contacts.filter(c => c.province === foundProvince);
-          if (matchedContacts.length > 0) {
-            aiText = `Danh bạ khẩn cấp tại ${foundProvince}:\n` +
-              matchedContacts.map(c => `• ${c.name}: ${c.phone}`).join('\n');
-          } else {
-            aiText = `Tôi không tìm thấy số điện thoại cứu hộ riêng cho ${foundProvince}. Bạn hãy liên hệ các hotline quốc gia như 112 nhé.`;
-          }
-        } else {
-          aiText = "Bạn cần tìm số điện thoại của khu vực nào? (Ví dụ: 'SĐT khẩn cấp Hà Nội').";
-        }
+      const data = await response.json();
+
+      if (!response.ok) {
+        const friendlyMsg = response.status === 429
+          ? 'Trợ lý đang bận, vui lòng đợi vài giây rồi thử lại nhé!'
+          : 'Xin lỗi, có lỗi xảy ra. Vui lòng thử lại sau.';
+        throw new Error(friendlyMsg);
       }
 
-      else if (foundProvince) {
-        const matchedZones = safeZones.filter(z => z.province === foundProvince);
-        const matchedContacts = contacts.filter(c => c.province === foundProvince);
-        aiText = `Thông tin tại ${foundProvince}:\n\n`;
-        if (matchedZones.length > 0) aiText += `Khu vực an toàn: ${matchedZones.length} địa điểm\n`;
-        if (matchedContacts.length > 0) aiText += `SĐT khẩn cấp: ${matchedContacts.length} đầu số\n`;
-        aiText += `\nBạn muốn xem chi tiết phần nào? (Ví dụ: "Xem khu vực an toàn ${foundProvince}")`;
-      }
-
-      else if (lowerText.includes('cứu hộ') || lowerText.includes('giúp')) {
-        aiText = "Để gửi yêu cầu cứu hộ khẩn cấp, bạn hãy nhấn vào nút 'GỬI YÊU CẦU CỨU HỘ' màu đỏ ở menu trên cùng sau đó theo dõi tiến độ";
-      } else if (lowerText.includes('chào') || lowerText.includes('hi')) {
-        aiText = "Chào bạn! Tôi là Trợ lý Cứu hộ 24/7. Bạn cần hỗ trợ thông tin về bão, tìm nơi trú ẩn hay liên hệ khẩn cấp không?";
-      } else {
-        aiText = "Xin lỗi, tôi chưa hiểu ý bạn. Bạn có thể chọn các mục hỗ trợ nhanh bên dưới nhé.";
-      }
+      const aiText = data?.data?.reply || 'Xin lỗi, tôi gặp sự cố. Vui lòng thử lại sau.';
 
       const aiMsg = {
         id: Date.now() + 1,
@@ -159,10 +90,23 @@ const Chatbot = () => {
         sender: 'ai',
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
-
       setMessages(prev => [...prev, aiMsg]);
+    } catch (error) {
+      console.error('Chat API error:', error);
+      // Hiển thị message cụ thể nếu có (ví dụ: rate limit), ngược lại hiện lỗi mạng
+      const displayText = error?.message && !error.message.includes('fetch')
+        ? error.message
+        : 'Kết nối gián đoạn. Vui lòng kiểm tra kết nối mạng và thử lại, hoặc gọi ngay 112 nếu khẩn cấp.';
+      const errorMsg = {
+        id: Date.now() + 1,
+        text: displayText,
+        sender: 'ai',
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      setMessages(prev => [...prev, errorMsg]);
+    } finally {
       setIsTyping(false);
-    }, 800);
+    }
   };
 
   const handleActionClick = (action) => {
@@ -173,6 +117,7 @@ const Chatbot = () => {
     <div className="fixed bottom-6 right-6 z-[2000] font-sans text-slate-900">
       {isOpen && (
         <div className="absolute bottom-20 right-0 w-[350px] sm:w-[400px] h-[580px] bg-white/95 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] border border-white/20 flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 duration-500">
+
           {/* Header */}
           <div className="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -183,7 +128,7 @@ const Chatbot = () => {
               <div>
                 <div className="font-bold text-base tracking-wide">Trợ lý Cứu hộ 24/7</div>
                 <div className="text-[11px] opacity-80 flex items-center gap-1 uppercase font-bold tracking-tighter">
-                  <Sparkles size={10} className="text-yellow-300" /> Hệ thống sẵn sàng
+                  <Sparkles size={10} className="text-yellow-300" /> AI
                 </div>
               </div>
             </div>
@@ -212,6 +157,7 @@ const Chatbot = () => {
                 </div>
               </div>
             ))}
+
             {isTyping && (
               <div className="flex justify-start">
                 <div className="bg-white border border-slate-100 p-4 rounded-3xl rounded-tl-none shadow-sm flex gap-1.5 px-6">
@@ -241,16 +187,19 @@ const Chatbot = () => {
 
             <div className="flex gap-3">
               <Input
-                placeholder="Hỏi về khu vực an toàn, SĐT cứu hộ..."
+                placeholder="Hỏi AI về thông tin bão, nơi an toàn, cứu hộ..."
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onPressEnter={() => handleSend(inputValue)}
+                disabled={isTyping}
                 className="rounded-2xl bg-slate-100 border-none focus:bg-white h-12 px-5 text-sm"
               />
               <Button
                 type="primary"
                 icon={<Send size={20} />}
                 onClick={() => handleSend(inputValue)}
+                loading={isTyping}
+                disabled={isTyping}
                 className="h-12 w-12 rounded-2xl flex items-center justify-center bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200"
               />
             </div>
@@ -267,7 +216,7 @@ const Chatbot = () => {
         {!isOpen && (
           <span className="absolute top-0 right-0 flex h-5 w-5 -mt-1 -mr-1">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-5 w-5 bg-red-500 border-2 border-white shadow-sm flex items-center justify-center text-[10px] font-bold">1</span>
+            <span className="relative inline-flex rounded-full h-5 w-5 bg-red-500 border-2 border-white shadow-sm items-center justify-center text-[10px] font-bold flex">1</span>
           </span>
         )}
       </button>

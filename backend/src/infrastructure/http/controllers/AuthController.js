@@ -1,5 +1,4 @@
 import { LoginUseCase } from '../../../application/usecases/auth/LoginUseCase.js';
-import { RegisterUseCase } from '../../../application/usecases/auth/RegisterUseCase.js';
 import { ForgotPasswordUseCase } from '../../../application/usecases/auth/ForgotPasswordUseCase.js';
 import { ResetPasswordUseCase } from '../../../application/usecases/auth/ResetPasswordUseCase.js';
 import { UserRepository } from '../../database/repositories/UserRepository.js';
@@ -12,16 +11,6 @@ export class AuthController {
       const loginUseCase = new LoginUseCase();
       const result = await loginUseCase.execute(email, password);
       return successResponse(res, result, 'Login successful');
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async register(req, res, next) {
-    try {
-      const registerUseCase = new RegisterUseCase();
-      const user = await registerUseCase.execute(req.body);
-      return successResponse(res, user, 'Registration successful', 201);
     } catch (error) {
       next(error);
     }

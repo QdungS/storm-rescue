@@ -34,7 +34,7 @@ const MapComponent = ({ rescues = [] }) => {
           attribution='&copy; Google Maps'
         />
 
-        {}
+        { }
         {rescues.map((rescue) => {
           if (rescue.lat && rescue.lng) {
             return (
@@ -65,12 +65,12 @@ const MapComponent = ({ rescues = [] }) => {
 
       </MapContainer>
 
-      {}
+      { }
       <div className="absolute top-4 left-4 z-[1000] bg-white/90 px-4 py-2 rounded shadow-md border-l-4 border-blue-600 backdrop-blur-sm">
-        <h2 className="font-bold text-gray-800 text-sm uppercase">Bản đồ Điều phối Cứu hộ</h2>
+        <h2 className="font-bold text-gray-800 text-sm uppercase">Bản đồ Vệ Tinh</h2>
       </div>
 
-      {}
+      { }
       <div className="absolute bottom-4 right-4 z-[1000] bg-white/90 p-3 rounded shadow-md backdrop-blur-sm">
         <div className="text-xs font-bold mb-2 text-center border-b pb-1">Chú thích</div>
         <div className="flex items-center text-xs mb-2">

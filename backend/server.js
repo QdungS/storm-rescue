@@ -1,7 +1,7 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import dotenv from 'dotenv';
 import { connectDatabase } from './src/infrastructure/database/mongoose/connection.js';
 import { errorHandler } from './src/infrastructure/http/middleware/error.middleware.js';
 import { notFoundHandler } from './src/infrastructure/http/middleware/notFound.middleware.js';
@@ -13,9 +13,7 @@ import warningRoutes from './src/infrastructure/http/routes/warning.routes.js';
 import userRoutes from './src/infrastructure/http/routes/user.routes.js';
 import safetyRoutes from './src/infrastructure/http/routes/safety.routes.js';
 import rescueRoutes from './src/infrastructure/http/routes/rescue.routes.js';
-
-// Load environment variables
-dotenv.config();
+import chatRoutes from './src/infrastructure/http/routes/chat.routes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -67,9 +65,6 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Static files for uploads
-app.use('/uploads', express.static('uploads'));
-
 // Root route
 app.get('/', (req, res) => {
   res.json({
@@ -116,6 +111,7 @@ app.use('/api/warnings', warningRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/safety', safetyRoutes);
 app.use('/api/rescues', rescueRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Error handling middleware (must be last)
 app.use(notFoundHandler);

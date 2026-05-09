@@ -99,8 +99,12 @@ async createSafeZone(req, res, next) {
 
 async createContact(req, res, next) {
     try {
+      const data = { ...req.body };
+      if (req.user && (req.user.role === 'coordinator' || req.user.role === 'officer')) {
+        data.province = req.user.province ? req.user.province.trim() : null;
+      }
       const useCase = new ManageEmergencyContactUseCase();
-      const contact = await useCase.create(req.body);
+      const contact = await useCase.create(data);
       return successResponse(res, contact, 'Emergency contact created successfully', 201);
     } catch (error) {
       next(error);
@@ -109,8 +113,12 @@ async createContact(req, res, next) {
 
   async getContacts(req, res, next) {
     try {
+      const query = { ...(req.query || {}) };
+      if (req.user && (req.user.role === 'coordinator' || req.user.role === 'officer')) {
+        query.province = req.user.province ? req.user.province.trim() : null;
+      }
       const useCase = new ManageEmergencyContactUseCase();
-      const contacts = await useCase.getAll(req.query || {});
+      const contacts = await useCase.getAll(query);
       return successResponse(res, contacts, 'Emergency contacts retrieved successfully');
     } catch (error) {
       next(error);
@@ -119,8 +127,12 @@ async createContact(req, res, next) {
 
   async updateContact(req, res, next) {
     try {
+      const data = { ...req.body };
+      if (req.user && (req.user.role === 'coordinator' || req.user.role === 'officer')) {
+        data.province = req.user.province ? req.user.province.trim() : null;
+      }
       const useCase = new ManageEmergencyContactUseCase();
-      const contact = await useCase.update(req.params.id, req.body);
+      const contact = await useCase.update(req.params.id, data);
       return successResponse(res, contact, 'Emergency contact updated successfully');
     } catch (error) {
       next(error);

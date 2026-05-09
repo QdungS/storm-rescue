@@ -9,22 +9,14 @@ import { useAuth } from '../context/AuthContext';
 const { TabPane } = Tabs;
 const { TextArea } = Input;
 
-const DATA_SOURCES = [
-  { label: 'Người dân gửi trực tiếp', value: 'user', color: 'blue' },
-  { label: 'Mạng xã hội (Social)', value: 'social', color: 'purple' },
-  { label: 'Báo chí & Tin tức', value: 'news', color: 'orange' }
-];
 
 const PROVINCES = [
-  'An Giang', 'Bà Rịa - Vũng Tàu', 'Bắc Giang', 'Bắc Kạn', 'Bạc Liêu', 'Bắc Ninh',
-  'Bến Tre', 'Bình Định', 'Bình Dương', 'Bình Phước', 'Bình Thuận', 'Cà Mau', 'Cần Thơ',
-  'Cao Bằng', 'Đà Nẵng', 'Đắk Lắk', 'Đắk Nông', 'Điện Biên', 'Đồng Nai', 'Đồng Tháp',
-  'Gia Lai', 'Hà Giang', 'Hà Nam', 'Hà Nội', 'Hà Tĩnh', 'Hải Dương', 'Hải Phòng', 'Hậu Giang',
-  'Hòa Bình', 'Hưng Yên', 'Khánh Hòa', 'Kiên Giang', 'Kon Tum', 'Lai Châu', 'Lâm Đồng', 'Lạng Sơn',
-  'Lào Cai', 'Long An', 'Nam Định', 'Nghệ An', 'Ninh Bình', 'Ninh Thuận', 'Phú Thọ', 'Phú Yên',
-  'Quảng Bình', 'Quảng Nam', 'Quảng Ngãi', 'Quảng Ninh', 'Quảng Trị', 'Sóc Trăng', 'Sơn La',
-  'Tây Ninh', 'Thái Bình', 'Thái Nguyên', 'Thanh Hóa', 'Thừa Thiên Huế', 'Tiền Giang',
-  'TP Hồ Chí Minh', 'Trà Vinh', 'Tuyên Quang', 'Vĩnh Long', 'Vĩnh Phúc', 'Yên Bái', 'Bình Giang'
+  'An Giang', 'Bắc Ninh', 'Cà Mau', 'Cao Bằng', 'Cần Thơ', 'Đà Nẵng',
+  'Đắk Lắk', 'Điện Biên', 'Đồng Nai', 'Đồng Tháp', 'Gia Lai', 'Hà Nội',
+  'Hà Tĩnh', 'Hải Phòng', 'Huế', 'Hưng Yên', 'Khánh Hòa', 'Lai Châu',
+  'Lâm Đồng', 'Lạng Sơn', 'Lào Cai', 'Nghệ An', 'Ninh Bình', 'Phú Thọ',
+  'Quảng Ngãi', 'Quảng Ninh', 'Quảng Trị', 'Sơn La', 'Tây Ninh',
+  'Thái Nguyên', 'Thanh Hóa', 'TP Hồ Chí Minh', 'Tuyên Quang', 'Vĩnh Long'
 ];
 
 const CoordinatorDashboard = () => {
@@ -146,12 +138,6 @@ const CoordinatorDashboard = () => {
   };
 
   const rescueColumns = [
-    {
-      title: 'Nguồn', dataIndex: 'source', key: 'source', width: 100, render: s => {
-        const src = DATA_SOURCES.find(ds => ds.value === s) || DATA_SOURCES[0];
-        return <Tag color={src.color}>{src.label.split(' ')[0]}</Tag>;
-      }
-    },
     { title: 'Tỉnh/TP', dataIndex: 'province', key: 'province' },
     { title: 'Địa chỉ', dataIndex: 'district', key: 'district' },
     { title: 'Người liên hệ', key: 'contact', render: (_, r) => <div><b>{r.contactName}</b><br />{r.contactPhone}</div> },
@@ -163,7 +149,7 @@ const CoordinatorDashboard = () => {
     },
     {
       title: 'Trạng thái', dataIndex: 'status', key: 'status', render: s => (
-        <Tag color={s === 'Đã được cứu' ? 'green' : s === 'Từ chối' ? 'red' : s === 'Đang xử lý' ? 'blue' : 'orange'}>{s}</Tag>
+        <Tag color={s === 'Đã giải quyết' ? 'green' : s === 'Từ chối' ? 'red' : s === 'Đang xử lý' ? 'blue' : 'orange'}>{s}</Tag>
       )
     },
     {
@@ -184,7 +170,14 @@ const CoordinatorDashboard = () => {
       title: 'Hành động', key: 'action', render: (_, r) => (
         <Space>
           <Button size="small" type="primary" icon={<UserPlus size={14} />} onClick={() => openModal('rescue', r)}>Giao đội</Button>
-          <Popconfirm title="Xóa yêu cầu cứu hộ này?" onConfirm={() => handleDelete('rescue', r.id)}>
+          <Popconfirm
+            title="Xóa yêu cầu cứu hộ này?"
+            description="Hành động này không thể hoàn tác. Dữ liệu yêu cầu cứu hộ sẽ bị xóa vĩnh viễn."
+            onConfirm={() => handleDelete('rescue', r.id)}
+            okText="Xác nhận xóa"
+            cancelText="Hủy"
+            okButtonProps={{ danger: true }}
+          >
             <Button size="small" danger icon={<Trash2 size={14} />} />
           </Popconfirm>
         </Space>
@@ -214,7 +207,14 @@ const CoordinatorDashboard = () => {
       title: 'Hành động', key: 'action', render: (_, r) => (
         <Space>
           <Button icon={<Edit size={14} />} onClick={() => openModal('warning', r)} />
-          <Popconfirm title="Xóa cảnh báo này?" description="Hành động này không thể hoàn tác." onConfirm={() => handleDelete('warning', r.id)} okText="Xóa" cancelText="Hủy" okButtonProps={{ danger: true }}>
+          <Popconfirm
+            title="Xóa cảnh báo này?"
+            description="Hành động này không thể hoàn tác. Bản tin cảnh báo sẽ bị gỡ bỏ."
+            onConfirm={() => handleDelete('warning', r.id)}
+            okText="Xác nhận xóa"
+            cancelText="Hủy"
+            okButtonProps={{ danger: true }}
+          >
             <Button danger icon={<Trash2 size={14} />} />
           </Popconfirm>
         </Space>
@@ -237,7 +237,7 @@ const CoordinatorDashboard = () => {
 
   const historyRequests = useMemo(() => {
     return rescueRequests
-      .filter(r => r.status === 'Đã được cứu' || r.status === 'Hoàn tất')
+      .filter(r => r.status === 'Đã giải quyết' || r.status === 'Hoàn tất')
       .filter(r => {
         if (!historyFilterAddress) return true;
         const address = `${r.district || ''} ${r.province || ''}`.toLowerCase();
@@ -253,19 +253,18 @@ const CoordinatorDashboard = () => {
     let rejected = 0;
     let trappedCount = 0;
     let duplicateCount = 0;
-    const sourceStats = { user: 0, social: 0, news: 0 };
+
 
     rescueRequests.forEach(r => {
       if (r.status === 'Chờ tiếp nhận') pending++;
       else if (r.status === 'Đang xử lý') inProgress++;
-      else if (r.status === 'Đã được cứu') completed++;
+      else if (r.status === 'Đã giải quyết') completed++;
       else if (r.status === 'Từ chối') rejected++;
 
       if (r.isDuplicate) duplicateCount++;
-      if (sourceStats[r.source] !== undefined) sourceStats[r.source]++;
     });
 
-    return { total, pending, inProgress, completed, rejected, duplicateCount, sourceStats };
+    return { total, pending, inProgress, completed, rejected, duplicateCount };
   }, [rescueRequests]);
 
   const officerList = users.filter(u => u.role === 'officer' && u.status === 'active');
@@ -278,28 +277,37 @@ const CoordinatorDashboard = () => {
 
         { }
         <TabPane tab={<span><AlertTriangle size={16} className="inline mr-1 text-red-500" /> Quản lý Yêu cầu Cứu hộ</span>} key="1">
-          <div className="mb-4 flex flex-col md:flex-row gap-4 bg-white p-4 rounded shadow-sm border border-gray-200">
-            <div className="flex-1">
-              <label className="block text-sm text-gray-600 mb-1 font-semibold">Lọc theo Địa chỉ</label>
+          <Card size="small" className="shadow-sm border-t-4 border-t-blue-500 mb-4">
+            <Row gutter={16} justify="start">
+              <Col span={8} md={3}><Statistic title={<span className="text-xs">Tổng yêu cầu</span>} value={rescueStats.total} valueStyle={{ fontSize: '20px' }} /></Col>
+              <Col span={8} md={3}><Statistic title={<span className="text-xs">Chờ tiếp nhận</span>} value={rescueStats.pending} valueStyle={{ fontSize: '20px', color: '#fa8c16' }} /></Col>
+              <Col span={8} md={3}><Statistic title={<span className="text-xs">Đang xử lý</span>} value={rescueStats.inProgress} valueStyle={{ fontSize: '20px', color: '#1890ff' }} /></Col>
+              <Col span={8} md={3}><Statistic title={<span className="text-xs">Từ chối</span>} value={rescueStats.rejected} valueStyle={{ fontSize: '20px', color: '#ff4d4f' }} /></Col>
+              <Col span={8} md={3}><Statistic title={<span className="text-xs">Đã giải quyết</span>} value={rescueStats.completed} valueStyle={{ fontSize: '20px', color: '#52c41a' }} /></Col>
+              <Col span={8} md={3}><Statistic title={<span className="text-xs">Trùng lặp</span>} value={rescueStats.duplicateCount} valueStyle={{ fontSize: '20px', color: '#8c8c8c' }} /></Col>
+            </Row>
+          </Card>
+
+          <div className="flex flex-col md:flex-row gap-4 mb-4">
+            <div className="flex-1 max-w-xs">
               <Input
-                placeholder="Nhập tên khu vực..."
+                placeholder="Lọc theo địa chỉ..."
                 value={filterDistrict}
                 onChange={e => setFilterDistrict(e.target.value)}
                 allowClear
               />
             </div>
-            <div className="flex-1">
-              <label className="block text-sm text-gray-600 mb-1 font-semibold">Trạng thái</label>
+            <div className="flex-1 max-w-xs">
               <Select
                 allowClear
-                placeholder="Tất cả trạng thái"
+                placeholder="Lọc theo trạng thái"
                 className="w-full"
                 value={filterStatus}
                 onChange={setFilterStatus}
               >
                 <Select.Option value="Chờ tiếp nhận">Chờ tiếp nhận</Select.Option>
                 <Select.Option value="Đang xử lý">Đang xử lý</Select.Option>
-                <Select.Option value="Đã được cứu">Đã được cứu</Select.Option>
+                <Select.Option value="Đã giải quyết">Đã giải quyết</Select.Option>
                 <Select.Option value="Từ chối">Từ chối</Select.Option>
               </Select>
             </div>
@@ -316,42 +324,8 @@ const CoordinatorDashboard = () => {
         { }
         <TabPane tab={<span><BarChart3 size={16} className="inline mr-1" /> Thống kê tổng quan</span>} key="8">
           <div className="space-y-6">
-            <Card title="Khái quát Nhiệm vụ Cứu hộ" className="shadow-sm border-t-4 border-t-red-500">
-              <Row gutter={16} className="mb-6">
-                <Col span={4}>
-                  <Statistic title="Tổng Yêu cầu" value={rescueStats.total} />
-                </Col>
-                <Col span={4}>
-                  <Statistic title="Chờ tiếp nhận" value={rescueStats.pending} valueStyle={{ color: '#fa8c16' }} />
-                </Col>
-                <Col span={4}>
-                  <Statistic title="Đang xử lý" value={rescueStats.inProgress} valueStyle={{ color: '#1890ff' }} />
-                </Col>
-                <Col span={4}>
-                  <Statistic title="Từ chối (Hủy/Spam)" value={rescueStats.rejected} valueStyle={{ color: '#ff4d4f' }} />
-                </Col>
-                <Col span={4}>
-                  <Statistic title="Đã được giúp" value={rescueStats.completed} valueStyle={{ color: '#52c41a' }} />
-                </Col>
-              </Row>
-              <Row gutter={16} className="border-t pt-4">
-                <Col span={6}>
-                  <Statistic title="Nguồn Mạng xã hội" value={rescueStats.sourceStats.social} suffix={`/ ${rescueStats.total}`} />
-                </Col>
-                <Col span={6}>
-                  <Statistic title="Nguồn Báo chí" value={rescueStats.sourceStats.news} suffix={`/ ${rescueStats.total}`} />
-                </Col>
-                <Col span={6}>
-                  <Statistic title="Nguồn Người dân" value={rescueStats.sourceStats.user} suffix={`/ ${rescueStats.total}`} />
-                </Col>
-                <Col span={6}>
-                  <Statistic title="Phát hiện Trùng lặp" value={rescueStats.duplicateCount} valueStyle={{ color: '#8c8c8c' }} />
-                </Col>
-              </Row>
-            </Card>
-
-            <Card 
-              title="Lịch sử Cứu hộ" 
+            <Card
+              title="Lịch sử Cứu hộ"
               className="shadow-sm border-t-4 border-t-green-500"
               extra={
                 <Input
@@ -389,14 +363,13 @@ const CoordinatorDashboard = () => {
               <div className="bg-red-50 p-4 rounded mb-4 border border-red-200">
                 <p><strong>Người liên hệ:</strong> {editingItem?.contactName} - {editingItem?.contactPhone}</p>
                 <p><strong>Địa Chỉ:</strong> {editingItem?.district}, {editingItem?.province}</p>
-                <p><strong>Nguồn:</strong> <Tag color={DATA_SOURCES.find(ds => ds.value === editingItem?.source)?.color}>{editingItem?.source}</Tag></p>
                 {editingItem?.isDuplicate && <Tag color="orange" className="mb-2">CẢNH BÁO: CÓ THỂ BỊ TRÙNG LẶP</Tag>}
                 <p><strong>Người mắc kẹt:</strong> {editingItem?.trappedCount} người ({editingItem?.demographics?.children} trẻ em, {editingItem?.demographics?.women} phụ nữ, {editingItem?.demographics?.elderly} người già).</p>
                 <p><strong>Mô tả:</strong> {editingItem?.description}</p>
                 {editingItem?.previousContact?.contactName && (
                   <div className="mt-2 bg-yellow-50 p-2 border border-yellow-200">
                     <strong>Đã từng có lực lượng qua:</strong><br />
-                    Tên: {editingItem.previousContact.contactName} - Đơn vị: {editingItem.previousContact.sourceLine}<br />
+                    Tên: {editingItem.previousContact.contactName}<br />
                     Lúc: {editingItem.previousContact.time} - SĐT: {editingItem.previousContact.phone}
                   </div>
                 )}
@@ -407,7 +380,7 @@ const CoordinatorDashboard = () => {
                   <Select.Option value="Chờ tiếp nhận">Chờ tiếp nhận</Select.Option>
                   <Select.Option value="Từ chối">Từ chối (Tin giả / Hủy)</Select.Option>
                   <Select.Option value="Đang xử lý">Đang xử lý (Chuyển cho đội cứu hộ)</Select.Option>
-                  <Select.Option value="Đã được cứu">Đã được cứu</Select.Option>
+                  <Select.Option value="Đã giải quyết">Đã giải quyết</Select.Option>
                 </Select>
               </Form.Item>
 
@@ -435,8 +408,8 @@ const CoordinatorDashboard = () => {
 
           {modalType === 'warning' && (
             <>
-              <Form.Item name="title" label="Tiêu đề" rules={[{ required: true }]}><Input /></Form.Item>
-              <Form.Item name="content" label="Nội dung" rules={[{ required: true }]}><TextArea rows={3} /></Form.Item>
+              <Form.Item name="title" label="Tiêu đề" rules={[{ required: true, message: 'Vui lòng nhập tiêu đề' }]}><Input /></Form.Item>
+              <Form.Item name="content" label="Nội dung" rules={[{ required: true, message: 'Vui lòng nhập nội dung' }]}><TextArea rows={3} /></Form.Item>
               <Form.Item name="level" label="Mức độ" initialValue="warning">
                 <Select>
                   <Select.Option value="urgent">Khẩn cấp (Urgent)</Select.Option>

@@ -14,7 +14,7 @@ export class CreateRescueRequestUseCase {
   }
 
   async execute(rescueData, userRole = null, userDistrict = null, userProvince = null) {
-    const { contactName, contactPhone, contactEmail, lat, lng, demographics, previousContact, description, status, notes, province, district, source = 'user', citizenId } = rescueData;
+    const { contactName, contactPhone, contactEmail, lat, lng, demographics, previousContact, description, status, notes, province, district, citizenId } = rescueData;
 
     if (!contactName || !contactPhone || !contactEmail || lat === undefined || lng === undefined) {
       throw new AppError('Thiếu các trường bắt buộc (Tên, SĐT, Email, Tọa độ)', 400);
@@ -63,7 +63,6 @@ let finalProvince = province;
       notes,
       province: finalProvince,
       district: finalDistrict,
-      source,
       isDuplicate,
       citizenId: citizenId || null
     });

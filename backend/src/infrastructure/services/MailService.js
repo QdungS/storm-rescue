@@ -92,7 +92,7 @@ class MailService {
       title = 'Đội cứu hộ đang trên đường tới';
       message = 'Yêu cầu cứu hộ của bạn đã xác nhận và phân công cho Đội cứu hộ tiếp cận. Lực lượng cứu hộ đang trên đường đến vị trí của bạn.';
       color = '#2563eb';
-    } else if (status === 'Đã được cứu') {
+    } else if (status === 'Đã giải quyết') {
       title = 'Nhiệm vụ cứu hộ hoàn tất thành công';
       message = 'Hệ thống ghi nhận nhiệm vụ cứu hộ của bạn đã được báo cáo hoàn tất an toàn. Xin chúc bạn và mọi người luôn bình an!';
       color = '#16a34a';

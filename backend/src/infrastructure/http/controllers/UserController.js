@@ -3,9 +3,7 @@ import { GetUsersUseCase } from '../../../application/usecases/user/GetUsersUseC
 import { UpdateUserUseCase } from '../../../application/usecases/user/UpdateUserUseCase.js';
 import { DeleteUserUseCase } from '../../../application/usecases/user/DeleteUserUseCase.js';
 import { ToggleUserLockUseCase } from '../../../application/usecases/user/ToggleUserLockUseCase.js';
-import { AddSavedLocationUseCase } from '../../../application/usecases/user/AddSavedLocationUseCase.js';
-import { RemoveSavedLocationUseCase } from '../../../application/usecases/user/RemoveSavedLocationUseCase.js';
-import { GetMySavedLocationsUseCase } from '../../../application/usecases/user/GetMySavedLocationsUseCase.js';
+
 import { successResponse } from '../../../shared/utils/response.js';
 
 export class UserController {
@@ -65,33 +63,5 @@ if (req.user && req.user.role === 'coordinator') {
     }
   }
 
-  async getMyLocations(req, res, next) {
-    try {
-      const getUseCase = new GetMySavedLocationsUseCase();
-      const locations = await getUseCase.execute(req.user.id);
-      return successResponse(res, locations, 'Saved locations retrieved successfully');
-    } catch (error) {
-      next(error);
-    }
-  }
 
-  async addLocation(req, res, next) {
-    try {
-      const addUseCase = new AddSavedLocationUseCase();
-      const user = await addUseCase.execute(req.user.id, req.body);
-      return successResponse(res, user, 'Location added successfully', 201);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async removeLocation(req, res, next) {
-    try {
-      const removeUseCase = new RemoveSavedLocationUseCase();
-      const user = await removeUseCase.execute(req.user.id, req.params.locationId);
-      return successResponse(res, user, 'Location removed successfully');
-    } catch (error) {
-      next(error);
-    }
-  }
 }
