@@ -264,10 +264,10 @@ npm run seed
 
 | Vai trò | Email | Mật khẩu |
 |---|---|---|
-| Quản trị viên (Admin) | admin@gmail.com | 123456 |
-| Điều phối viên (Coordinator) | dieuphoi@gmail.com | 123456 |
-| Đội cứu hộ 1 (Officer) | cuuho1@gmail.com | 123456 |
-| Đội cứu hộ 2 (Officer) | cuuho2@gmail.com | 123456 |
+| Quản trị viên  | admin@gmail.com | 123456 |
+| Điều phối viên 1  | dieuphoi1@gmail.com | 123456 |
+| Đội cứu hộ 1  | cuuho1@gmail.com | 123456 |
+| Đội cứu hộ 2  | cuuho2@gmail.com | 123456 |
 
 ---
 
@@ -275,11 +275,10 @@ npm run seed
 
 | Vai trò | Mã vai trò | Quyền hạn |
 |---|---|---|
-| **Quản trị viên** | `admin` | Quản lý tài khoản, cảnh báo, khu vực an toàn, hướng dẫn an toàn, liên hệ khẩn cấp, thống kê toàn hệ thống |
-| **Điều phối viên** | `coordinator` | Tiếp nhận & điều phối yêu cầu cứu hộ, phân công đội cứu hộ, quản lý cảnh báo — **giới hạn theo tỉnh** |
-| **Đội cứu hộ** | `officer` | Nhận & xử lý nhiệm vụ cứu hộ, cập nhật tiến độ, quản lý cảnh báo & khu vực an toàn — **giới hạn theo tỉnh** |
-| **Người dân** | `citizen` | Gửi yêu cầu cứu hộ, xem bản đồ, tra cứu tiến độ bằng mã cứu hộ, xem thông tin an toàn |
-| **Khách** | (không đăng nhập) | Xem bản đồ, gửi yêu cầu cứu hộ, tra cứu bằng mã cứu hộ |
+| **Quản trị viên** | Quản lý tài khoản, cảnh báo, khu vực an toàn, hướng dẫn an toàn, liên hệ khẩn cấp, thống kê toàn hệ thống |
+| **Điều phối viên** |Tiếp nhận & điều phối yêu cầu cứu hộ, phân công đội cứu hộ, quản lý cảnh báo — **giới hạn theo tỉnh** |
+| **Đội cứu hộ** |Nhận & xử lý nhiệm vụ cứu hộ, cập nhật tiến độ, quản lý cảnh báo & khu vực an toàn — **giới hạn theo tỉnh** |
+| **Người dân** | Gửi yêu cầu cứu hộ, xem bản đồ, tra cứu tiến độ bằng mã cứu hộ, xem thông tin an toàn |
 
 ---
 
