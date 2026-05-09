@@ -18,7 +18,7 @@ export class UpdateRescueRequestUseCase {
 const statusChanged = rescueData.status && rescueData.status !== existing.status;
     if (statusChanged) {
       if (rescueData.status === 'Đang xử lý') rescueData.processingAt = new Date();
-      if (rescueData.status === 'Đã được cứu') rescueData.rescuedAt = new Date();
+      if (rescueData.status === 'Đã giải quyết') rescueData.rescuedAt = new Date();
     }
 
 const request = await this.rescueRepository.update(id, rescueData);
@@ -27,7 +27,7 @@ if (statusChanged) {
       const email = request.contactEmail || existing.contactEmail;
       const code = request.rescueCode || existing.rescueCode;
 
-      if (email && (rescueData.status === 'Đang xử lý' || rescueData.status === 'Đã được cứu')) {
+      if (email && (rescueData.status === 'Đang xử lý' || rescueData.status === 'Đã giải quyết')) {
         try {
           await mailService.sendStatusUpdateEmail(email, code, rescueData.status);
         } catch (e) {
