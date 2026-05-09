@@ -1,6 +1,6 @@
-# 🌊 HỆ THỐNG HỖ TRỢ CỨU HỘ BÃO (Storm Rescue)
+# 🌊 HỆ THỐNG QUẢN LÝ THÔNG TIN CỨU HỘ BÃO (Storm Rescue)
 
-> Hệ thống quản lý và điều phối cứu hộ bão — Đồ án tốt nghiệp Đại học Thăng Long.
+ Đồ án tốt nghiệp Đại học Thăng Long.
 
 ## 📖 Giới thiệu
 
