@@ -1,10 +1,10 @@
-# 🌊 HỆ THỐNG HỖ TRỢ CỨU HỘ SAU BÃO (Storm Rescue Platform)
+# 🌊 HỆ THỐNG HỖ TRỢ CỨU HỘ BÃO (Storm Rescue)
 
-> Hệ thống quản lý và điều phối cứu hộ sau bão — Đồ án tốt nghiệp Đại học Thăng Long.
+> Hệ thống quản lý và điều phối cứu hộ bão — Đồ án tốt nghiệp Đại học Thăng Long.
 
 ## 📖 Giới thiệu
 
-**Storm Rescue** là nền tảng web hỗ trợ công tác cứu hộ trong và sau thiên tai bão lũ. Hệ thống cho phép người dân gửi yêu cầu cứu hộ khẩn cấp, điều phối viên tiếp nhận và phân công nhiệm vụ, lực lượng cứu hộ xử lý và báo cáo tiến độ — tất cả được hiển thị trực quan trên bản đồ thời gian thực.
+**Storm Rescue** là nền tảng web hỗ trợ công tác cứu hộ thiên tai bão lũ. Hệ thống cho phép người dân gửi yêu cầu cứu hộ khẩn cấp, điều phối viên tiếp nhận và phân công nhiệm vụ, lực lượng cứu hộ xử lý và báo cáo tiến độ — tất cả được hiển thị trực quan trên bản đồ thời gian thực.
 
 ### Tính năng chính
 
