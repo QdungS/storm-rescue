@@ -65,7 +65,6 @@ const AppHeader = ({ warnings, openWarnings, setOpenWarnings }) => {
     { key: '1', icon: <MapIcon size={16} />, label: <Link to="/">Bản đồ</Link> },
     { key: 'safety', icon: <BookOpen size={16} />, label: <Link to="/safety">Thông tin an toàn</Link> },
 
-    // Logic ẩn hiện menu theo quyền
     (!user || user.role === 'citizen') ? {
       key: 'report',
       label: (
@@ -170,7 +169,6 @@ const AppContent = () => {
 
   const isScopedRole = user && ['guest', 'citizen', 'officer', 'admin', 'coordinator'].includes(user.role);
 
-  // Lọc yêu cầu cứu hộ cho bản đồ và danh sách
   const filteredRescuesForMap = React.useMemo(() => {
     if (!rescueRequests) return [];
 
@@ -178,13 +176,11 @@ const AppContent = () => {
       r => r.status !== 'Đã giải quyết' && r.status !== 'Từ chối'
     );
 
-    // Nếu có chọn tỉnh để lọc
     if (selectedProvinces.length > 0) {
       const targets = selectedProvinces.map(normalizeProvince);
       return activeRescues.filter(r => targets.includes(normalizeProvince(r.province)));
     }
 
-    // Nếu không lọc, hiển thị tất cả yêu cầu đang hoạt động
     return activeRescues;
   }, [rescueRequests, selectedProvinces]);
 
@@ -201,7 +197,6 @@ const AppContent = () => {
     fetchMapData();
   }, [user]);
 
-  // Lắng nghe sự kiện cập nhật từ các Dashboard để đồng bộ bản đồ real-time
   useEffect(() => {
     const handleRescueUpdated = () => {
       fetchMapData();
@@ -230,7 +225,6 @@ const AppContent = () => {
     fetchWarnings();
   }, [user]);
 
-  // Lắng nghe sự kiện cập nhật cảnh báo từ các Dashboard để đồng bộ real-time
   useEffect(() => {
     const handleWarningUpdated = () => {
       fetchWarnings();
@@ -240,18 +234,14 @@ const AppContent = () => {
   }, []);
 
   const filteredWarnings = React.useMemo(() => {
-    // Nếu là điều phối viên hoặc đội cứu hộ, backend đã lọc tuyệt đối chuẩn, trả thẳng luôn
     if (user && ['coordinator', 'officer'].includes(user.role)) {
       return warnings;
     }
 
-    // Cảnh báo luôn hiển thị tất cả cho Admin và Người dân
-    // Chỉ lọc khi người dùng chủ động chọn tỉnh trên bộ lọc
     if (selectedProvinces.length > 0) {
       const targets = selectedProvinces.map(normalizeProvince);
       return warnings.filter(w => {
         const wp = normalizeProvince(w.province);
-        // Hiện cảnh báo không có province (cảnh báo chung) + cảnh báo theo tỉnh đã chọn
         return !wp || targets.includes(wp);
       });
     }
@@ -379,7 +369,6 @@ const AppContent = () => {
               </div>
             } />
 
-            {/* Catch-all route - redirect to home if route not found */}
             <Route path="*" element={
               <div className="w-full h-full flex items-center justify-center">
                 <div className="text-center">

@@ -28,7 +28,6 @@ const Login = () => {
 
   return (
     <div className="min-h-[calc(100vh-120px)] w-full bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex justify-center items-center py-10 px-4 relative overflow-hidden font-sans">
-      {/* Background decorations */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-blue-500/20 blur-[120px]"></div>
         <div className="absolute top-[60%] -right-[10%] w-[40%] h-[60%] rounded-full bg-cyan-500/20 blur-[100px]"></div>

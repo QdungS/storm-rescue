@@ -61,7 +61,6 @@ const Chatbot = () => {
     setIsTyping(true);
 
     try {
-      // Gửi lịch sử hội thoại để AI nhớ ngữ cảnh (bỏ tin nhắn chào mừng đầu tiên)
       const history = updatedMessages.slice(1, -1).map(msg => ({
         sender: msg.sender,
         text: msg.text,
@@ -93,7 +92,6 @@ const Chatbot = () => {
       setMessages(prev => [...prev, aiMsg]);
     } catch (error) {
       console.error('Chat API error:', error);
-      // Hiển thị message cụ thể nếu có (ví dụ: rate limit), ngược lại hiện lỗi mạng
       const displayText = error?.message && !error.message.includes('fetch')
         ? error.message
         : 'Kết nối gián đoạn. Vui lòng kiểm tra kết nối mạng và thử lại, hoặc gọi ngay 112 nếu khẩn cấp.';
@@ -118,7 +116,6 @@ const Chatbot = () => {
       {isOpen && (
         <div className="absolute bottom-20 right-0 w-[350px] sm:w-[400px] h-[580px] bg-white/95 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] border border-white/20 flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 duration-500">
 
-          {/* Header */}
           <div className="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 relative">
@@ -140,7 +137,6 @@ const Chatbot = () => {
             </button>
           </div>
 
-          {/* Messages */}
           <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-slate-50/50">
             {messages.map((msg) => (
               <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -170,7 +166,6 @@ const Chatbot = () => {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Quick Actions & Input */}
           <div className="p-6 bg-white border-t border-slate-100 shadow-[0_-10px_40px_rgba(0,0,0,0.03)]">
             <div className="flex overflow-x-auto gap-2 mb-5 pb-1 no-scrollbar">
               {quickActions.map((action, idx) => (
@@ -207,7 +202,6 @@ const Chatbot = () => {
         </div>
       )}
 
-      {/* Floating Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`w-18 h-18 rounded-3xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-[0_15px_35px_rgba(37,99,235,0.4)] flex items-center justify-center transition-all duration-500 hover:scale-105 active:scale-95 group relative ${isOpen ? 'rotate-90' : ''}`}

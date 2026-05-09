@@ -6,7 +6,6 @@ import { connectDatabase } from './src/infrastructure/database/mongoose/connecti
 import { errorHandler } from './src/infrastructure/http/middleware/error.middleware.js';
 import { notFoundHandler } from './src/infrastructure/http/middleware/notFound.middleware.js';
 
-// Import routes
 import authRoutes from './src/infrastructure/http/routes/auth.routes.js';
 import warningRoutes from './src/infrastructure/http/routes/warning.routes.js';
 
@@ -18,14 +17,11 @@ import chatRoutes from './src/infrastructure/http/routes/chat.routes.js';
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Security middleware
 app.use(helmet());
-// CORS configuration - support multiple origins for production
 const allowedOrigins = process.env.FRONTEND_URL
   ? process.env.FRONTEND_URL.split(',').map(url => url.trim())
   : ['http://localhost:5174'];
 
-// Check if origin is a Vercel domain
 const isVercelDomain = (origin) => {
   return origin && (
     origin.includes('.vercel.app') ||
@@ -37,35 +33,28 @@ const isVercelDomain = (origin) => {
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, Postman, etc.)
     if (!origin) return callback(null, true);
 
-    // Allow if in allowed origins list
     if (allowedOrigins.indexOf(origin) !== -1) {
       return callback(null, true);
     }
 
-    // Allow Vercel domains in production
     if (isVercelDomain(origin)) {
       return callback(null, true);
     }
 
-    // Allow all origins in development
     if (process.env.NODE_ENV !== 'production') {
       return callback(null, true);
     }
 
-    // Reject in production if not allowed
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true
 }));
 
-// Body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Root route
 app.get('/', (req, res) => {
   res.json({
     message: 'Flood Rescue Platform API',
@@ -83,12 +72,10 @@ app.get('/', (req, res) => {
   });
 });
 
-// Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// API info route
 app.get('/api', (req, res) => {
   res.json({
     message: 'Flood Rescue Platform API',
@@ -105,7 +92,6 @@ app.get('/api', (req, res) => {
   });
 });
 
-// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/warnings', warningRoutes);
 app.use('/api/users', userRoutes);
@@ -113,18 +99,14 @@ app.use('/api/safety', safetyRoutes);
 app.use('/api/rescues', rescueRoutes);
 app.use('/api/chat', chatRoutes);
 
-// Error handling middleware (must be last)
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-// Start server
 const startServer = async () => {
   try {
-    // Connect to database
     await connectDatabase();
     console.log('✓ Database connected');
 
-    // Start listening - use 0.0.0.0 for Render deployment
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`✓ Server running on port ${PORT}`);
       console.log(`✓ Environment: ${process.env.NODE_ENV || 'development'}`);

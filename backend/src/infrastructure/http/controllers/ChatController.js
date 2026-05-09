@@ -48,7 +48,6 @@ export class ChatController {
         return res.status(400).json({ success: false, message: 'Message is required' });
       }
 
-      // Lấy dữ liệu thực từ DB để inject vào context AI
       let safeZones = [];
       let contacts = [];
       try {
@@ -64,7 +63,6 @@ export class ChatController {
 
       const systemPrompt = buildSystemPrompt(safeZones, contacts);
 
-      // Chuyển đổi history sang format OpenAI-compatible (Groq)
       const groqHistory = history.map(msg => ({
         role: msg.sender === 'user' ? 'user' : 'assistant',
         content: msg.text,
@@ -76,7 +74,6 @@ export class ChatController {
         { role: 'user', content: message },
       ];
 
-      // Gọi Groq API (OpenAI-compatible)
       const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
