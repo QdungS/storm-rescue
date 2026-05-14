@@ -65,7 +65,7 @@ const SafetyInfo = () => {
               extra={<Tag color="blue">{guide.category}</Tag>}
             >
               <Paragraph className="text-gray-700 whitespace-pre-line">{guide.content}</Paragraph>
-              <div className="text-xs text-gray-400 text-right">Cập nhật: {guide.updatedAt}</div>
+              <div className="text-xs text-gray-400 text-right">Cập nhật: {new Date(guide.updatedAt).toLocaleString('vi-VN')}</div>
             </Collapse.Panel>
           ))}
         </Collapse>
