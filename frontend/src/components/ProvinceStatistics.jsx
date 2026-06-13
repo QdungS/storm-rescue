@@ -6,7 +6,6 @@ import {
 } from 'recharts';
 import { MapPin, Users, Activity } from 'lucide-react';
 
-/* ─── constants ──────────────────────────────────────────────── */
 const STATUS_CFG = [
   { key: 'pending', label: 'Chờ tiếp nhận', color: '#fa8c16', bg: '#fff7e6' },
   { key: 'inProgress', label: 'Đang xử lý', color: '#1677ff', bg: '#e6f4ff' },
@@ -24,7 +23,6 @@ const DEMO_CFG = [
 const PIE_COLORS = ['#6366f1', '#ec4899', '#f59e0b', '#14b8a6'];
 const RADIAN = Math.PI / 180;
 
-/* ─── tooltips ───────────────────────────────────────────────── */
 const BarTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
@@ -77,7 +75,6 @@ const PieLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
   );
 };
 
-/* ─── main component ─────────────────────────────────────────── */
 const ProvinceStatistics = ({ statsData = [], loading = false, allProvinces = [] }) => {
   const [selectedProvince, setSelectedProvince] = useState(null);
   const [selectedDistrict, setSelectedDistrict] = useState(null);
@@ -114,7 +111,6 @@ const ProvinceStatistics = ({ statsData = [], loading = false, allProvinces = []
     setSelectedDistrict(null);
   };
 
-  /* dropdown source: prefer allProvinces list, fallback to API provinces */
   const provinceList = allProvinces.length > 0
     ? allProvinces
     : statsData.map(d => d.province);
@@ -122,7 +118,6 @@ const ProvinceStatistics = ({ statsData = [], loading = false, allProvinces = []
   return (
     <div style={{ padding: '0 4px' }}>
 
-      {/* ── selector bar ── */}
       <div style={{
         background: '#172554',
         borderRadius: 16, padding: '16px 20px', marginBottom: 24,
@@ -138,7 +133,6 @@ const ProvinceStatistics = ({ statsData = [], loading = false, allProvinces = []
           <MapPin size={18} color="#fff" />
         </div>
 
-        {/* province */}
         <div>
           <p style={{ margin: '0 0 3px', color: '#94a3b8', fontSize: 11 }}>Tỉnh / Thành phố</p>
           <Select
@@ -160,7 +154,6 @@ const ProvinceStatistics = ({ statsData = [], loading = false, allProvinces = []
           </Select>
         </div>
 
-        {/* district — chỉ hiện khi có data */}
         {provinceData && districts.length > 0 && (
           <div>
             <p style={{ margin: '0 0 3px', color: '#94a3b8', fontSize: 11 }}>Phường / Quận</p>
@@ -181,7 +174,6 @@ const ProvinceStatistics = ({ statsData = [], loading = false, allProvinces = []
           </div>
         )}
 
-        {/* totals */}
         {activeData && (
           <div style={{ display: 'flex', gap: 20, flexShrink: 0 }}>
             <div style={{ textAlign: 'center' }}>
@@ -196,12 +188,10 @@ const ProvinceStatistics = ({ statsData = [], loading = false, allProvinces = []
         )}
       </div>
 
-      {/* loading */}
       {loading && (
         <div style={{ textAlign: 'center', padding: 60 }}><Spin size="large" /></div>
       )}
 
-      {/* no province */}
       {!loading && !selectedProvince && (
         <div style={{
           background: 'linear-gradient(135deg, #f8faff, #eef2ff)',
@@ -218,7 +208,6 @@ const ProvinceStatistics = ({ statsData = [], loading = false, allProvinces = []
         </div>
       )}
 
-      {/* province selected but no DB data */}
       {!loading && selectedProvince && !provinceData && (
         <div style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
@@ -235,10 +224,8 @@ const ProvinceStatistics = ({ statsData = [], loading = false, allProvinces = []
         </div>
       )}
 
-      {/* charts */}
       {!loading && selectedProvince && provinceData && (
         <>
-          {/* breadcrumb phường */}
           {selectedDistrict && (
             <div style={{
               background: '#f0f9ff', borderRadius: 10, padding: '8px 14px',
@@ -258,7 +245,6 @@ const ProvinceStatistics = ({ statsData = [], loading = false, allProvinces = []
 
           <Row gutter={[20, 20]}>
 
-            {/* ── biểu đồ cột ── */}
             <Col xs={24} xl={13}>
               <div style={{
                 background: '#fff', borderRadius: 16, padding: '24px',
@@ -280,7 +266,6 @@ const ProvinceStatistics = ({ statsData = [], loading = false, allProvinces = []
                   </div>
                 </div>
 
-                {/* mini cards trạng thái */}
                 <Row gutter={8} style={{ marginBottom: 20 }}>
                   {STATUS_CFG.map(s => (
                     <Col span={6} key={s.key}>
@@ -299,7 +284,6 @@ const ProvinceStatistics = ({ statsData = [], loading = false, allProvinces = []
                   ))}
                 </Row>
 
-                {/* bar chart status */}
                 <ResponsiveContainer width="100%" height={240}>
                   <BarChart data={barData} barSize={42} barCategoryGap="30%"
                     margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
@@ -317,7 +301,6 @@ const ProvinceStatistics = ({ statsData = [], loading = false, allProvinces = []
               </div>
             </Col>
 
-            {/* ── biểu đồ tròn ── */}
             <Col xs={24} xl={11}>
               <div style={{
                 background: '#fff', borderRadius: 16, padding: '24px',
@@ -339,7 +322,6 @@ const ProvinceStatistics = ({ statsData = [], loading = false, allProvinces = []
                   </div>
                 </div>
 
-                {/* mini cards 4 loại */}
                 <Row gutter={8} style={{ marginBottom: 16 }}>
                   {DEMO_CFG.map(c => (
                     <Col span={6} key={c.key}>
@@ -358,7 +340,6 @@ const ProvinceStatistics = ({ statsData = [], loading = false, allProvinces = []
                   ))}
                 </Row>
 
-                {/* pie */}
                 {totalRescued === 0 ? (
                   <div style={{
                     display: 'flex', flexDirection: 'column', alignItems: 'center',
@@ -392,7 +373,6 @@ const ProvinceStatistics = ({ statsData = [], loading = false, allProvinces = []
                   </ResponsiveContainer>
                 )}
 
-                {/* tổng */}
                 <div style={{
                   marginTop: 12, background: 'linear-gradient(135deg, #f0fdf4, #dcfce7)',
                   borderRadius: 10, padding: '10px 14px',
