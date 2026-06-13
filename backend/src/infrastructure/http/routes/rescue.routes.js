@@ -6,13 +6,15 @@ import {
   updateRescueRequest,
   deleteRescueRequest,
   acceptRescueRequest,
-  reportFakeRescueRequest
+  reportFakeRescueRequest,
+  getStatsByProvince
 } from '../controllers/RescueRequestController.js';
 import { authenticate, authorize, optionalAuthenticate } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
 router.get('/', optionalAuthenticate, getRescueRequests);
+router.get('/stats', authenticate, authorize('admin'), getStatsByProvince);
 
 router.get('/code/:code', optionalAuthenticate, getRescueRequestByCode);
 

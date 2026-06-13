@@ -1,4 +1,5 @@
 import { RescueRequestRepository } from '../../database/repositories/RescueRequestRepository.js';
+import mongoose from 'mongoose';
 import { RescueRequestModel } from '../../database/mongoose/models/RescueRequestModel.js';
 import { UserModel } from '../../database/mongoose/models/UserModel.js';
 import { CreateRescueRequestUseCase } from '../../../application/usecases/rescue/CreateRescueRequestUseCase.js';
@@ -35,11 +36,11 @@ export const getRescueRequests = async (req, res, next) => {
     if (req.query.district) filters.district = req.query.district;
     if (req.query.status) filters.status = req.query.status;
 
-if (req.user && req.user.role === 'citizen' && req.query.isMine === 'true') {
+    if (req.user && req.user.role === 'citizen' && req.query.isMine === 'true') {
       filters.citizenId = req.user.id;
     }
 
-if (req.user && (req.user.role === 'coordinator' || req.user.role === 'officer')) {
+    if (req.user && (req.user.role === 'coordinator' || req.user.role === 'officer')) {
       filters.province = req.user.province;
     }
 
@@ -68,7 +69,7 @@ export const updateRescueRequest = async (req, res, next) => {
     const userDistrict = req.user?.district;
     const userProvince = req.user?.province;
 
-if (data.assignedTo) {
+    if (data.assignedTo) {
       data.coordinatedBy = req.user?.id;
     }
 
@@ -107,12 +108,12 @@ export const reportFakeRescueRequest = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Request not found' });
     }
 
-const userId = req.user.id;
+    const userId = req.user.id;
     if (!request.spamReports.includes(userId)) {
       request.spamReports.push(userId);
       await request.save();
 
-if (request.spamReports.length >= 3) {
+      if (request.spamReports.length >= 3) {
         request.status = 'Từ chối';
         await request.save();
 
@@ -129,6 +130,74 @@ if (request.spamReports.length >= 3) {
       }
     }
     return successResponse(res, request, 'Reported fake request successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
+/* Extract ward/commune name from a free-text address.
+   e.g. "29 Hoàng Ngân, Phường Túc Duyên" → "Phường Túc Duyên"
+        "Số 21, Đường sắt, Phường Quang Vinh" → "Phường Quang Vinh"        */
+const extractWard = (address) => {
+  if (!address) return 'Không xác định';
+  const match = address.match(/(?:phường|xã|thị trấn|thị xã|quận|huyện)\s+[^,]+/i);
+  if (match) return match[0].trim();
+  return 'Không rõ phường/xã';
+};
+
+export const getStatsByProvince = async (req, res, next) => {
+  try {
+    const allRequests = await RescueRequestModel.find({}).lean();
+
+    const provinceMap = {};
+
+    for (const r of allRequests) {
+      const prov = r.province || 'Không xác định';
+      const ward = extractWard(r.district);   // ← group by ward, not raw address
+
+      if (!provinceMap[prov]) {
+        provinceMap[prov] = {
+          province: prov,
+          total: 0, pending: 0, inProgress: 0, resolved: 0, rejected: 0,
+          rescuedChildren: 0, rescuedWomen: 0, rescuedElderly: 0, rescuedOthers: 0,
+          districts: {}
+        };
+      }
+      const p = provinceMap[prov];
+      p.total++;
+
+      if (!p.districts[ward]) {
+        p.districts[ward] = {
+          district: ward,
+          total: 0, pending: 0, inProgress: 0, resolved: 0, rejected: 0,
+          rescuedChildren: 0, rescuedWomen: 0, rescuedElderly: 0, rescuedOthers: 0
+        };
+      }
+      const d = p.districts[ward];
+      d.total++;
+
+      if (r.status === 'Chờ tiếp nhận')    { p.pending++;    d.pending++;    }
+      else if (r.status === 'Đang xử lý')  { p.inProgress++; d.inProgress++; }
+      else if (r.status === 'Đã giải quyết') {
+        p.resolved++; d.resolved++;
+        const children = r.demographics?.children || 0;
+        const women    = r.demographics?.women    || 0;
+        const elderly  = r.demographics?.elderly  || 0;
+        const trapped  = r.trappedCount           || 0;
+        const others   = Math.max(0, trapped - children - women - elderly);
+        p.rescuedChildren += children; d.rescuedChildren += children;
+        p.rescuedWomen    += women;    d.rescuedWomen    += women;
+        p.rescuedElderly  += elderly;  d.rescuedElderly  += elderly;
+        p.rescuedOthers   += others;   d.rescuedOthers   += others;
+      } else if (r.status === 'Từ chối')   { p.rejected++;   d.rejected++;   }
+    }
+
+    const stats = Object.values(provinceMap).map(prov => ({
+      ...prov,
+      districts: Object.values(prov.districts).sort((a, b) => b.total - a.total)
+    })).sort((a, b) => b.total - a.total);
+
+    return res.json({ success: true, data: stats });
   } catch (error) {
     next(error);
   }

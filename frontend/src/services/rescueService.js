@@ -24,5 +24,10 @@ export const rescueService = {
 
     async reportFake(id) {
         return await api.post(`/rescues/${id}/report-fake`);
+    },
+
+    async getStatsByProvince() {
+        const response = await api.get('/rescues/stats');
+        return response.data || [];
     }
 };

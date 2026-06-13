@@ -4,7 +4,9 @@ import { Edit, Trash2, Plus, MapPin, Bell, BookOpen, Users, Lock, Unlock, Shield
 import { warningService } from '../services/warningService';
 import { safetyService } from '../services/safetyService';
 import { userService } from '../services/userService';
+import { rescueService } from '../services/rescueService';
 import { useAuth } from '../context/AuthContext';
+import ProvinceStatistics from '../components/ProvinceStatistics';
 
 const { TabPane } = Tabs;
 const { TextArea } = Input;
@@ -26,6 +28,8 @@ const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [safeZones, setSafeZones] = useState([]);
   const [contacts, setContacts] = useState([]);
+  const [statsData, setStatsData] = useState([]);
+  const [statsLoading, setStatsLoading] = useState(false);
   const [userFilterProvince, setUserFilterProvince] = useState('');
   const [userFilterAddress, setUserFilterAddress] = useState('');
   const [loading, setLoading] = useState(false);
@@ -53,8 +57,21 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchStats = async () => {
+    setStatsLoading(true);
+    try {
+      const data = await rescueService.getStatsByProvince();
+      setStatsData(data);
+    } catch (error) {
+      console.error('Failed to fetch stats:', error);
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchData();
+    fetchStats();
   }, []);
 
   const filteredUsers = useMemo(() => {
@@ -417,6 +434,11 @@ const AdminDashboard = () => {
         <TabPane tab={<span><BookOpen size={16} className="inline mr-1" /> Hướng dẫn</span>} key="7">
           <Button type="primary" className="mb-4 bg-green-600" icon={<Plus size={16} />} onClick={() => openModal('guide')}>Thêm tài liệu</Button>
           <Table columns={guideColumns} dataSource={guides} rowKey="id" pagination={{ pageSize: 5 }} />
+        </TabPane>
+
+        { }
+        <TabPane tab={<span><BarChart3 size={16} className="inline mr-1" /> Thống kê tổng quan</span>} key="9">
+          <ProvinceStatistics statsData={statsData} loading={statsLoading} />
         </TabPane>
 
 
