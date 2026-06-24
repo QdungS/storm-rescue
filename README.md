@@ -1,7 +1,5 @@
 # 🌊 HỆ THỐNG QUẢN LÝ THÔNG TIN CỨU HỘ BÃO (Storm Rescue)
 
-Đồ án tốt nghiệp Đại học Thăng Long.
-
 ## 📖 Giới thiệu
 
 **Storm Rescue** là nền tảng web hỗ trợ công tác cứu hộ thiên tai bão lũ. Hệ thống cho phép người dân gửi yêu cầu cứu hộ khẩn cấp, điều phối viên tiếp nhận và phân công nhiệm vụ, lực lượng cứu hộ xử lý và báo cáo tiến độ — tất cả được hiển thị trực quan trên bản đồ thời gian thực.
